@@ -129,36 +129,36 @@ body {
   box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary) 20%, transparent);
 }
 
-/* Hero responsivo com imagem ao lado quando há espaço */
-.hero {
+/* =======================
+   Destaque (antes hero)
+======================= */
+.destaque {
   display: grid;
   gap: var(--space-4);
   align-items: center;
   padding: var(--space-5) 0 var(--space-4);
 }
-.hero__content h2 {
+@media (min-width: 760px) {
+  .destaque {
+    grid-template-columns: 1.2fr 1fr;
+  }
+}
+.destaque__content h2 {
   font-size: var(--step-3);
   line-height: 1.1;
   margin: 0 0 var(--space-2);
 }
-.hero__content p {
+.destaque__content p {
   color: var(--muted);
   margin: 0 0 var(--space-3);
   max-width: 60ch;
 }
-.hero__image {
+.destaque__media img {
   width: 100%;
   height: auto;
   border-radius: var(--radius);
   box-shadow: var(--shadow);
   object-fit: cover;
-}
-
-/* Em telas médias, vira 2 colunas; em pequenas, fica 1 */
-@media (min-width: 760px) {
-  .hero {
-    grid-template-columns: 1.2fr 1fr;
-  }
 }
 
 /* Botões e links */
@@ -230,6 +230,12 @@ body {
   margin: 0;
   color: var(--muted);
 }
+.card__img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  border-radius: calc(var(--radius) - 4px);
+}
 .link {
   text-decoration: none;
   color: var(--primary);
@@ -279,7 +285,28 @@ body {
   color: var(--muted);
 }
 
-/* Estados de foco universais para acessibilidade */
+/* Parallax sections */
+.parallax {
+  min-height: 38vh;
+  background-attachment: fixed;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  filter: saturate(1.05) contrast(1.02);
+}
+.parallax--top {
+  background-image: url("https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=1920&auto=format&fit=crop");
+}
+.parallax--bottom {
+  background-image: url("https://images.unsplash.com/photo-1519389950473-47ba0277781c?q=80&w=1920&auto=format&fit=crop");
+}
+@media (prefers-reduced-motion: reduce) {
+  .parallax {
+    background-attachment: scroll;
+  }
+}
+
+/* Estados de foco universais */
 :focus-visible {
   outline: none;
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 40%, transparent);

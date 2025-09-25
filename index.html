@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Beaqme</title>
+    <title>Beaqme — Desenvolvimento sob medida</title>
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
@@ -12,67 +12,113 @@
         <h1 class="brand">Beaqme</h1>
         <nav class="nav">
           <a href="#" class="nav__link">Início</a>
-          <a href="#" class="nav__link">Sobre</a>
+          <a href="#" class="nav__link">Serviços</a>
+          <a href="#" class="nav__link">Portfólio</a>
           <a href="#" class="nav__link">Contato</a>
         </nav>
       </div>
     </header>
 
+    <!-- Parallax 1 -->
+    <div
+      class="parallax parallax--top"
+      role="img"
+      aria-label="Equipe trabalhando em projeto digital"
+    ></div>
+
     <main class="container">
-      <section class="hero">
-        <div class="hero__content">
-          <h2>Frontend sem dor de cabeça</h2>
+      <!-- era .hero; agora .destaque -->
+      <section class="destaque">
+        <div class="destaque__content">
+          <h2>Seu projeto digital nas mãos certas</h2>
           <p>
-            Estrutura limpa, acessível e responsiva. Serve em mobile, tablet e
-            desktop sem gambiarra.
+            Sites e sistemas sob medida: rápidos, acessíveis e responsivos. Do
+            layout ao código, entregamos soluções que funcionam em qualquer
+            dispositivo.
           </p>
-          <a class="btn" href="#">Começar agora</a>
+          <a class="btn" href="#contato">Solicitar orçamento</a>
         </div>
-        <img
-          class="hero__image"
-          src="https://via.placeholder.com/800x480"
-          alt="Prévia do projeto"
-        />
+        <picture class="destaque__media">
+          <source
+            srcset="
+              https://images.unsplash.com/photo-1551836022-d5d88e9218df?q=80&w=1200&auto=format&fit=crop
+            "
+            media="(min-width: 760px)"
+          />
+          <img
+            src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=1200&auto=format&fit=crop"
+            alt="Prévia de interface em notebook e smartphone"
+            loading="lazy"
+            width="1200"
+            height="800"
+          />
+        </picture>
       </section>
 
       <section class="grid">
         <article class="card">
-          <h3>Rápido</h3>
+          <img
+            class="card__img"
+            src="https://images.unsplash.com/photo-1507679799987-c73779587ccf?q=80&w=800&auto=format&fit=crop"
+            alt=""
+            loading="lazy"
+            width="800"
+            height="600"
+          />
+          <h3>Agilidade</h3>
           <p>
-            Layout leve e tipografia fluida. Nada de CSS de 200 KB para mostrar
-            dois parágrafos.
+            Processo enxuto e prazos realistas. Entregas contínuas, sem novela.
           </p>
-          <a class="link" href="#">Detalhes</a>
+          <a class="link" href="#">Ver detalhes</a>
         </article>
         <article class="card">
-          <h3>Acessível</h3>
-          <p>
-            Contraste ok, foco visível e redução de movimento para quem precisa.
-          </p>
-          <a class="link" href="#">Como funciona</a>
+          <img
+            class="card__img"
+            src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?q=80&w=800&auto=format&fit=crop"
+            alt=""
+            loading="lazy"
+            width="800"
+            height="600"
+          />
+          <h3>Qualidade</h3>
+          <p>Acessibilidade, desempenho e UX de verdade. Bonito e funcional.</p>
+          <a class="link" href="#">Nossos diferenciais</a>
         </article>
         <article class="card">
-          <h3>Escalável</h3>
-          <p>
-            Variáveis, espaçamentos consistentes e grid que cresce sem quebrar.
-          </p>
-          <a class="link" href="#">Ver exemplos</a>
+          <img
+            class="card__img"
+            src="https://images.unsplash.com/photo-1529333166437-7750a6dd5a70?q=80&w=800&auto=format&fit=crop"
+            alt=""
+            loading="lazy"
+            width="800"
+            height="600"
+          />
+          <h3>Escalabilidade</h3>
+          <p>Arquitetura preparada para crescer. Sem recomeçar do zero.</p>
+          <a class="link" href="#">Projetos realizados</a>
         </article>
       </section>
 
       <section class="cta">
-        <h2>Pronto para subir?</h2>
+        <h2>Pronto para publicar?</h2>
         <p>
-          Esse bloco é o push final. Coloque aqui o que você realmente quer que
-          a pessoa faça.
+          Cuidamos de tudo: planejamento, desenvolvimento e deploy. Você foca no
+          negócio.
         </p>
-        <button class="btn btn--ghost">Ver plano</button>
+        <button class="btn btn--ghost" id="contato">Falar com a Beaqme</button>
       </section>
     </main>
 
+    <!-- Parallax 2 -->
+    <div
+      class="parallax parallax--bottom"
+      role="img"
+      aria-label="Textura geométrica em tons escuros"
+    ></div>
+
     <footer class="site-footer">
       <div class="container">
-        <small>© 2025 Beaqme • Feito com um mínimo de bom senso</small>
+        <small>© 2025 Beaqme • Desenvolvimento sob medida</small>
       </div>
     </footer>
   </body>
