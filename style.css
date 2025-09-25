@@ -1,0 +1,287 @@
+/* =======================
+   Design tokens
+======================= */
+:root {
+  --bg: #f7f9fc;
+  --surface: #ffffff;
+  --text: #1f2937;
+  --muted: #6b7280;
+  --primary: #2563eb;
+  --primary-press: #1d4ed8;
+  --ring: 2px solid rgba(37, 99, 235, 0.4);
+
+  --radius: 12px;
+  --shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+
+  /* Escalas fluidas */
+  --step--1: clamp(0.85rem, 0.8rem + 0.2vw, 0.95rem);
+  --step-0: clamp(1rem, 0.96rem + 0.35vw, 1.125rem);
+  --step-1: clamp(1.25rem, 1.1rem + 0.8vw, 1.5rem);
+  --step-2: clamp(1.5rem, 1.3rem + 1.2vw, 1.875rem);
+  --step-3: clamp(2rem, 1.7rem + 2vw, 2.5rem);
+
+  --space-1: clamp(8px, 0.8vw, 12px);
+  --space-2: clamp(12px, 1.2vw, 16px);
+  --space-3: clamp(16px, 1.8vw, 24px);
+  --space-4: clamp(24px, 2.4vw, 36px);
+  --space-5: clamp(32px, 3.2vw, 48px);
+}
+
+/* Dark mode automático */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0b1220;
+    --surface: #0f172a;
+    --text: #e5e7eb;
+    --muted: #9ca3af;
+    --primary: #60a5fa;
+    --primary-press: #3b82f6;
+    --shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    --ring: 2px solid rgba(96, 165, 250, 0.4);
+  }
+}
+
+/* Resets mínimos e base */
+* {
+  box-sizing: border-box;
+}
+html,
+body {
+  height: 100%;
+}
+body {
+  margin: 0;
+  font-family:
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    Segoe UI,
+    Roboto,
+    Ubuntu,
+    Cantarell,
+    Noto Sans,
+    Arial,
+    "Apple Color Emoji",
+    "Segoe UI Emoji";
+  color: var(--text);
+  background:
+    radial-gradient(
+        1200px 800px at 10% -10%,
+        rgba(37, 99, 235, 0.06),
+        transparent 40%
+      )
+      no-repeat,
+    var(--bg);
+  line-height: 1.6;
+  font-size: var(--step-0);
+  display: flex;
+  flex-direction: column;
+}
+
+/* Acessibilidade e movimento */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* Layout utilitário */
+.container {
+  width: min(1100px, 92%);
+  margin-inline: auto;
+}
+
+/* Header */
+.site-header {
+  position: sticky;
+  top: 0;
+  backdrop-filter: saturate(1.2) blur(8px);
+  background: color-mix(in srgb, var(--bg) 70%, transparent);
+  border-bottom: 1px solid color-mix(in srgb, var(--muted) 20%, transparent);
+  z-index: 10;
+}
+.site-header .container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-2) 0;
+}
+.brand {
+  font-size: var(--step-1);
+  margin: 0;
+}
+.nav {
+  display: flex;
+  gap: var(--space-2);
+}
+.nav__link {
+  text-decoration: none;
+  color: var(--text);
+  opacity: 0.8;
+  padding: 0.4rem 0.6rem;
+  border-radius: 8px;
+}
+.nav__link:hover,
+.nav__link:focus-visible {
+  opacity: 1;
+  outline: none;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary) 20%, transparent);
+}
+
+/* Hero responsivo com imagem ao lado quando há espaço */
+.hero {
+  display: grid;
+  gap: var(--space-4);
+  align-items: center;
+  padding: var(--space-5) 0 var(--space-4);
+}
+.hero__content h2 {
+  font-size: var(--step-3);
+  line-height: 1.1;
+  margin: 0 0 var(--space-2);
+}
+.hero__content p {
+  color: var(--muted);
+  margin: 0 0 var(--space-3);
+  max-width: 60ch;
+}
+.hero__image {
+  width: 100%;
+  height: auto;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  object-fit: cover;
+}
+
+/* Em telas médias, vira 2 colunas; em pequenas, fica 1 */
+@media (min-width: 760px) {
+  .hero {
+    grid-template-columns: 1.2fr 1fr;
+  }
+}
+
+/* Botões e links */
+.btn {
+  display: inline-block;
+  padding: 0.8rem 1.1rem;
+  background: var(--primary);
+  color: white;
+  text-decoration: none;
+  border: 0;
+  border-radius: 10px;
+  box-shadow: var(--shadow);
+  transform: translateZ(0);
+  transition:
+    transform 150ms ease,
+    background 150ms ease;
+}
+.btn:hover,
+.btn:focus-visible {
+  transform: translateY(-1px);
+  background: var(--primary-press);
+  outline: none;
+  box-shadow:
+    0 0 0 0 var(--ring),
+    var(--shadow);
+}
+.btn:active {
+  transform: translateY(0);
+}
+
+.btn--ghost {
+  background: transparent;
+  color: var(--primary);
+  border: 1px solid color-mix(in srgb, var(--primary) 70%, var(--surface));
+}
+
+/* Cards em grid fluido 1–2–3 colunas */
+.grid {
+  display: grid;
+  gap: var(--space-3);
+  grid-template-columns: 1fr;
+  margin: var(--space-4) 0;
+}
+@media (min-width: 640px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (min-width: 1024px) {
+  .grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid color-mix(in srgb, var(--muted) 18%, transparent);
+  border-radius: var(--radius);
+  padding: var(--space-3);
+  box-shadow: var(--shadow);
+  display: grid;
+  gap: var(--space-2);
+}
+.card h3 {
+  margin: 0;
+  font-size: var(--step-1);
+}
+.card p {
+  margin: 0;
+  color: var(--muted);
+}
+.link {
+  text-decoration: none;
+  color: var(--primary);
+  font-weight: 600;
+  width: fit-content;
+}
+.link:hover,
+.link:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary) 25%, transparent);
+  border-radius: 6px;
+}
+
+/* Bloco CTA */
+.cta {
+  text-align: center;
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--primary) 10%, transparent),
+      transparent 60%
+    ),
+    var(--surface);
+  border: 1px solid color-mix(in srgb, var(--muted) 18%, transparent);
+  border-radius: calc(var(--radius) + 4px);
+  padding: var(--space-4);
+  margin: var(--space-5) 0;
+  box-shadow: var(--shadow);
+}
+.cta h2 {
+  font-size: var(--step-2);
+  margin: 0 0 var(--space-2);
+}
+.cta p {
+  margin: 0 0 var(--space-3);
+  color: var(--muted);
+}
+
+/* Footer */
+.site-footer {
+  margin-top: auto;
+  border-top: 1px solid color-mix(in srgb, var(--muted) 20%, transparent);
+  background: color-mix(in srgb, var(--bg) 80%, transparent);
+  padding: var(--space-3) 0;
+}
+.site-footer small {
+  color: var(--muted);
+}
+
+/* Estados de foco universais para acessibilidade */
+:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 40%, transparent);
+  border-radius: 6px;
+}
