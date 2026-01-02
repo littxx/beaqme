@@ -2,121 +2,310 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Beaqme Health</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Beaqme Health | Mobile AI</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+    
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+
     <style>
+        :root {
+            --app-bg: #000000;
+            --card-bg: #1c1c1e;
+            --text-primary: #ffffff;
+            --text-secondary: #8e8e93;
+            --accent-red: #ff3b30;   /* Heart Rate */
+            --accent-green: #32d74b; /* Activity */
+            --accent-blue: #0a84ff;  /* Sleep/Water */
+            --accent-orange: #ff9f0a;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+
         body {
-            background-color: #000; color: white; font-family: 'Inter', sans-serif;
-            display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0;
+            background-color: #111;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
         }
 
-        /* Moldura de "Celular" */
-        .mobile-container {
-            width: 100%; max-width: 375px; background: #1c1c1e; height: 95vh; max-height: 800px;
-            border-radius: 40px; padding: 30px 20px; position: relative;
-            box-shadow: 0 0 0 10px #333, 0 20px 50px rgba(0,0,0,0.5);
-            display: flex; flex-direction: column; overflow: hidden;
+        /* --- MOLDURA DO CELULAR (Só aparece no Desktop) --- */
+        .phone-frame {
+            width: 390px;
+            height: 844px; /* Tamanho iPhone */
+            background: var(--app-bg);
+            border-radius: 50px;
+            box-shadow: 0 0 0 12px #333, 0 50px 100px rgba(0,0,0,0.5);
+            position: relative;
+            overflow: hidden; /* Corta o conteúdo nas bordas redondas */
+            display: flex;
+            flex-direction: column;
         }
 
-        /* Topo */
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .date { color: #888; font-size: 0.9rem; text-transform: uppercase; font-weight: bold; }
-        .user-pic { width: 40px; height: 40px; background: #444; border-radius: 50%; }
-
-        /* Resumo Atividade (Anéis) */
-        .activity-card {
-            background: #2c2c2e; border-radius: 20px; padding: 20px; margin-bottom: 20px;
-            display: flex; justify-content: space-between; align-items: center;
-        }
-        .rings {
-            width: 100px; height: 100px; border-radius: 50%;
-            background: conic-gradient(#fa114f 70%, #2c2c2e 0);
-            position: relative; display: flex; align-items: center; justify-content: center;
-        }
-        .rings::before {
-            content: ''; position: absolute; width: 80px; height: 80px; background: #2c2c2e; border-radius: 50%;
-        }
-        .rings::after {
-            content: '70%'; position: absolute; font-weight: bold; font-size: 1.2rem;
+        /* Ilha dinâmica / Notch */
+        .notch {
+            position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+            width: 120px; height: 35px; background: #000;
+            border-bottom-left-radius: 20px; border-bottom-right-radius: 20px;
+            z-index: 100;
         }
 
-        .stats div { margin-bottom: 10px; }
-        .stats h3 { font-size: 1.5rem; margin: 0; }
-        .stats p { color: #fa114f; font-size: 0.8rem; margin: 0; }
-
-        /* Grid de Cards Menores */
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .mini-card { background: #2c2c2e; padding: 15px; border-radius: 20px; }
-        .icon { font-size: 1.5rem; margin-bottom: 10px; display: block; }
-
-        .heart-rate { color: #ff3b30; }
-        .water { color: #5ac8fa; }
-
-        /* Botão Voltar */
-        .btn-home {
-            margin-top: auto; background: #333; color: white; border: none;
-            width: 100%; padding: 15px; border-radius: 20px; font-weight: bold; cursor: pointer;
-            text-decoration: none; text-align: center; display: block;
+        /* --- APP CONTENT --- */
+        .app-content {
+            flex: 1;
+            padding: 50px 20px 20px 20px; /* Top padding maior por causa do notch */
+            overflow-y: auto;
+            scrollbar-width: none; /* Esconde scrollbar Firefox */
         }
-        .btn-home:hover { background: #555; }
+        .app-content::-webkit-scrollbar { display: none; } /* Esconde scrollbar Chrome */
 
-        /* Animação Simples */
-        @keyframes beat { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
-        .heart-icon { animation: beat 1s infinite; display: inline-block; }
+        /* HEADER */
+        .header {
+            display: flex; justify-content: space-between; align-items: flex-end;
+            margin-bottom: 25px;
+        }
+        .header h1 { font-size: 2rem; font-weight: 800; line-height: 1; }
+        .header p { color: var(--text-secondary); font-size: 0.9rem; font-weight: 600; text-transform: uppercase; margin-bottom: 5px; }
+        .user-avatar {
+            width: 45px; height: 45px; background: #333; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; color: #666; font-weight: bold;
+            border: 2px solid #222;
+        }
+
+        /* CARDS */
+        .card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 15px;
+        }
+
+        /* ACTIVITY RINGS (CSS PURO) */
+        .activity-container { display: flex; justify-content: space-between; align-items: center; }
+        .activity-text h3 { font-size: 1.2rem; margin-bottom: 5px; }
+        .activity-text span { color: var(--accent-orange); font-weight: 600; }
+        
+        .rings-wrapper {
+            width: 100px; height: 100px; position: relative;
+        }
+        /* Círculo externo (Move) */
+        .ring-outer {
+            width: 100%; height: 100%; border-radius: 50%;
+            background: conic-gradient(var(--accent-red) 75%, #331010 0);
+            position: absolute; display: flex; align-items: center; justify-content: center;
+        }
+        /* Círculo médio (Exercise) */
+        .ring-middle {
+            width: 75%; height: 75%; border-radius: 50%;
+            background: conic-gradient(var(--accent-green) 60%, #0f3015 0);
+            position: absolute; z-index: 2;
+        }
+        /* Círculo interno (Stand) */
+        .ring-inner {
+            width: 50%; height: 50%; border-radius: 50%;
+            background: conic-gradient(var(--accent-blue) 85%, #08203d 0);
+            position: absolute; z-index: 3; top: 25%; left: 25%;
+        }
+        /* Buraco preto no meio */
+        .ring-hole {
+            width: 25%; height: 25%; background: var(--card-bg); border-radius: 50%;
+            position: absolute; z-index: 4; top: 37.5%; left: 37.5%;
+        }
+
+        /* HEART RATE CARD */
+        .heart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .heart-title { display: flex; align-items: center; gap: 8px; font-weight: 600; color: var(--accent-red); }
+        .bpm-display { font-size: 2.5rem; font-weight: 800; display: flex; align-items: baseline; gap: 5px; }
+        .bpm-unit { font-size: 1rem; color: var(--text-secondary); font-weight: 500; }
+        
+        .heart-icon { animation: beat 1s infinite; }
+        @keyframes beat { 0% { transform: scale(1); } 15% { transform: scale(1.2); } 30% { transform: scale(1); } }
+
+        /* GRID PEQUENO */
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 80px; }
+        
+        .stat-icon { font-size: 1.8rem; margin-bottom: 10px; display: block; }
+        .stat-value { font-size: 1.5rem; font-weight: 700; }
+        .stat-label { font-size: 0.8rem; color: var(--text-secondary); margin-top: 2px; }
+
+        /* TAB BAR (Navegação Inferior) */
+        .tab-bar {
+            position: absolute; bottom: 0; left: 0; width: 100%;
+            height: 80px; background: rgba(28, 28, 30, 0.95);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid #333;
+            display: flex; justify-content: space-around; align-items: center;
+            padding-bottom: 20px; /* Espaço para a barra home do iPhone */
+        }
+        .tab-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: #666; cursor: pointer; }
+        .tab-item.active { color: var(--accent-green); }
+        .tab-item span { font-size: 1.6rem; }
+        .tab-label { font-size: 0.7rem; font-weight: 500; }
+
+        /* BOTÃO VOLTAR FLUTUANTE */
+        .back-btn-float {
+            position: absolute; top: 20px; left: 20px; z-index: 200;
+            background: rgba(255,255,255,0.1); backdrop-filter: blur(5px);
+            color: white; text-decoration: none; padding: 8px 16px; border-radius: 20px;
+            font-size: 0.8rem; font-weight: 600; border: 1px solid rgba(255,255,255,0.1);
+        }
+        .back-btn-float:hover { background: rgba(255,255,255,0.2); }
+
+        /* --- RESPONSIVIDADE REAL (Quando abre no celular mesmo) --- */
+        @media (max-width: 500px) {
+            body { background-color: #000; display: block; }
+            .phone-frame {
+                width: 100%; height: 100vh;
+                border-radius: 0; box-shadow: none; border: none;
+            }
+            .notch { display: none; }
+            .back-btn-float { top: 10px; left: 10px; }
+        }
 
     </style>
 </head>
 <body>
 
-    <div class="mobile-container">
-        <div class="header">
-            <div>
-                <div class="date">Segunda, 2 Jan</div>
-                <h1>Resumo</h1>
-            </div>
-            <div class="user-pic"></div>
-        </div>
+    <a href="index.html" class="back-btn-float">← Voltar ao Site</a>
 
-        <div class="activity-card">
-            <div class="stats">
+    <div class="phone-frame">
+        <div class="notch"></div>
+
+        <div class="app-content">
+            <div class="header">
                 <div>
-                    <h3>8,432</h3>
-                    <p>Passos</p>
+                    <p id="currentDate">QUINTA, 2 JAN</p>
+                    <h1>Resumo</h1>
                 </div>
-                <div>
-                    <h3>450</h3>
-                    <p>Kcal</p>
+                <div class="user-avatar">JD</div>
+            </div>
+
+            <div class="card activity-container">
+                <div class="activity-text">
+                    <h3>Atividade</h3>
+                    <div style="margin-top: 10px;">
+                        <div style="color:var(--accent-red); font-size:0.9rem;">Move <span style="float:right; color:#fff">450/600</span></div>
+                        <div style="color:var(--accent-green); font-size:0.9rem;">Exercise <span style="float:right; color:#fff">35/30</span></div>
+                        <div style="color:var(--accent-blue); font-size:0.9rem;">Stand <span style="float:right; color:#fff">8/12</span></div>
+                    </div>
+                </div>
+                <div class="rings-wrapper">
+                    <div class="ring-outer"></div>
+                    <div class="ring-middle"></div>
+                    <div class="ring-inner"></div>
+                    <div class="ring-hole"></div>
                 </div>
             </div>
-            <div class="rings"></div>
+
+            <div class="card">
+                <div class="heart-header">
+                    <div class="heart-title">
+                        <span class="material-icons-round heart-icon">favorite</span>
+                        Batimentos
+                    </div>
+                    <div style="color: var(--text-secondary); font-size: 0.8rem;">AGORA</div>
+                </div>
+                
+                <div class="bpm-display">
+                    <span id="bpmValue">72</span> <span class="bpm-unit">BPM</span>
+                </div>
+
+                <div id="heartChart" style="margin: 10px -15px -15px -15px; min-height: 100px;"></div>
+            </div>
+
+            <div class="grid-2">
+                <div class="card" style="margin:0;">
+                    <span class="material-icons-round stat-icon" style="color: var(--accent-blue);">bedtime</span>
+                    <div class="stat-value">7h 20m</div>
+                    <div class="stat-label">Tempo na Cama</div>
+                </div>
+
+                <div class="card" style="margin:0;">
+                    <span class="material-icons-round stat-icon" style="color: var(--accent-orange);">directions_run</span>
+                    <div class="stat-value">8,432</div>
+                    <div class="stat-label">Passos Hoje</div>
+                </div>
+                
+                <div class="card" style="margin:0;">
+                    <span class="material-icons-round stat-icon" style="color: #5ac8fa;">water_drop</span>
+                    <div class="stat-value">1,250<span style="font-size:1rem; color:#666">ml</span></div>
+                    <div class="stat-label">Meta: 2.500ml</div>
+                </div>
+
+                <div class="card" style="margin:0;">
+                    <span class="material-icons-round stat-icon" style="color: #af52de;">self_improvement</span>
+                    <div class="stat-value">15<span style="font-size:1rem; color:#666">min</span></div>
+                    <div class="stat-label">Mindfulness</div>
+                </div>
+            </div>
+            
         </div>
 
-        <div class="grid">
-            <div class="mini-card">
-                <span class="icon heart-icon">❤️</span>
-                <span style="font-size: 0.9rem; color: #888;">Batimentos</span>
-                <div style="font-size: 1.8rem; font-weight: bold; margin-top: 5px;">78 <span style="font-size:1rem">bpm</span></div>
+        <div class="tab-bar">
+            <div class="tab-item active">
+                <span class="material-icons-round">grid_view</span>
+                <span class="tab-label">Resumo</span>
             </div>
-
-            <div class="mini-card">
-                <span class="icon">💧</span>
-                <span style="font-size: 0.9rem; color: #888;">Hidratação</span>
-                <div style="font-size: 1.8rem; font-weight: bold; margin-top: 5px;">1.2 <span style="font-size:1rem">L</span></div>
+            <div class="tab-item">
+                <span class="material-icons-round">leaderboard</span>
+                <span class="tab-label">Tendências</span>
             </div>
-
-            <div class="mini-card" style="grid-column: span 2;">
-                <span class="icon">🌙</span>
-                <span style="font-size: 0.9rem; color: #888;">Sono</span>
-                <div style="font-size: 1.5rem; font-weight: bold; margin-top: 5px;">7h 20m</div>
-                <div style="height: 4px; background: #444; margin-top: 10px; border-radius: 2px;">
-                    <div style="width: 80%; height: 100%; background: #a2845e; border-radius: 2px;"></div>
-                </div>
+            <div class="tab-item">
+                <span class="material-icons-round">person</span>
+                <span class="tab-label">Perfil</span>
             </div>
         </div>
-
-        <a href="index.html" class="btn-home">Voltar ao Site</a>
     </div>
 
+    <script>
+        // 1. ATUALIZAR DATA DO TOPO
+        const dateOptions = { weekday: 'long', day: 'numeric', month: 'short' };
+        document.getElementById('currentDate').innerText = new Date().toLocaleDateString('pt-BR', dateOptions).toUpperCase();
+
+        // 2. GRÁFICO DE BATIMENTOS (ApexCharts)
+        var options = {
+            series: [{
+                name: "BPM",
+                data: [68, 70, 72, 71, 75, 78, 80, 76, 74, 72, 70, 72, 74]
+            }],
+            chart: {
+                type: 'area',
+                height: 100,
+                sparkline: { enabled: true }, // Remove eixos e grids (Minimalista)
+                animations: { enabled: true, easing: 'linear', dynamicAnimation: { speed: 1000 } }
+            },
+            stroke: { curve: 'smooth', width: 2 },
+            fill: {
+                type: 'gradient',
+                gradient: { shadeIntensity: 1, opacityFrom: 0.7, opacityTo: 0.1, stops: [0, 90, 100] }
+            },
+            colors: ['#ff3b30'],
+            tooltip: { enabled: false }
+        };
+
+        var chart = new ApexCharts(document.querySelector("#heartChart"), options);
+        chart.render();
+
+        // 3. SIMULAÇÃO DE BATIMENTOS (LIVE DATA)
+        function updateHeartRate() {
+            const min = 68;
+            const max = 82;
+            // Gera um número aleatório entre 68 e 82
+            const newBpm = Math.floor(Math.random() * (max - min + 1) + min);
+            
+            // Atualiza o texto grande
+            document.getElementById('bpmValue').innerText = newBpm;
+
+            // Atualiza o gráfico (empurra novo dado e remove o antigo)
+            // (Na vida real usaria appendData, aqui vamos simplificar para visual)
+        }
+
+        setInterval(updateHeartRate, 2000); // Atualiza a cada 2 segundos
+
+    </script>
 </body>
 </html>
