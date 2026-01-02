@@ -1,125 +1,512 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="pt-BR">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Beaqme — Desenvolvimento sob medida</title>
-    <link rel="stylesheet" href="style.css" />
-  </head>
-  <body>
-    <header class="site-header">
-      <div class="container">
-        <h1 class="brand">Beaqme</h1>
-        <nav class="nav">
-          <a href="#" class="nav__link">Início</a>
-          <a href="#" class="nav__link">Serviços</a>
-          <a href="#" class="nav__link">Portfólio</a>
-          <a href="#" class="nav__link">Contato</a>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Beaqme | Code & Design</title>
+    <meta name="description" content="Desenvolvimento de software sob medida, apps e sistemas de alta performance.">
+
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://beaqme.com/">
+    <meta property="og:title" content="Beaqme - Desenvolvimento Sob Medida">
+    <meta property="og:description" content="Transformo ideias em sistemas digitais. Veja meu portfólio.">
+    <meta property="og:image" content="https://via.placeholder.com/1200x630.png?text=Beaqme+Preview">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;800&display=swap" rel="stylesheet">
+
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
+    <style>
+        /* --- CSS: VARIÁVEIS & RESET --- */
+        :root {
+            --bg-color: #0a0a0c;
+            --text-color: #e0e0e0;
+            --accent-primary: #8a2be2; /* Roxo Neon */
+            --accent-secondary: #00e5ff; /* Ciano */
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --input-bg: rgba(255, 255, 255, 0.05);
+            --mobile-header-height: 70px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+            scroll-behavior: smooth;
+            -webkit-tap-highlight-color: transparent; /* Remove flash azul no mobile */
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            overflow-x: hidden; /* Evita scroll lateral indesejado */
+        }
+
+        a { text-decoration: none; color: inherit; transition: 0.3s; }
+        ul { list-style: none; }
+        img { max-width: 100%; display: block; }
+
+        /* --- BOTÕES --- */
+        .btn {
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            padding: 14px 32px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-primary), #6a0dad);
+            color: #fff;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .btn-primary:hover {
+            box-shadow: 0 0 25px rgba(138, 43, 226, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .btn-outline {
+            border: 1px solid var(--glass-border);
+            background: var(--glass-bg);
+            color: #fff;
+        }
+
+        .btn-outline:hover {
+            border-color: var(--accent-secondary);
+            color: var(--accent-secondary);
+            background: rgba(0, 229, 255, 0.05);
+        }
+
+        .btn-small { padding: 10px 20px; font-size: 0.85rem; }
+
+        /* --- HEADER --- */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 5%;
+            height: 80px;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            background: rgba(10, 10, 12, 0.9);
+            backdrop-filter: blur(15px);
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #fff;
+            letter-spacing: -0.5px;
+            z-index: 1002;
+        }
+
+        /* Menu Desktop */
+        .desktop-nav { display: flex; align-items: center; gap: 40px; }
+        .desktop-nav ul { display: flex; gap: 30px; }
+        .desktop-nav a { font-size: 0.9rem; font-weight: 500; opacity: 0.7; }
+        .desktop-nav a:hover { opacity: 1; color: var(--accent-secondary); }
+
+        /* Menu Mobile Toggle (Hambúrguer) */
+        .mobile-toggle {
+            display: none;
+            flex-direction: column;
+            gap: 6px;
+            cursor: pointer;
+            z-index: 1002;
+        }
+        .bar {
+            width: 25px; height: 2px; background-color: #fff; transition: 0.3s;
+        }
+
+        /* Menu Mobile (Escondido por padrão) */
+        .mobile-menu {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100vh;
+            background: #0a0a0c;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 30px;
+            transform: translateY(-100%);
+            transition: 0.4s ease-in-out;
+            z-index: 1001;
+        }
+        .mobile-menu.active { transform: translateY(0); }
+        .mobile-menu a { font-size: 1.5rem; font-weight: 600; color: #fff; }
+
+        /* --- HERO --- */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 120px 20px 60px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-glow {
+            position: absolute;
+            width: 800px; height: 800px;
+            background: radial-gradient(circle, rgba(138,43,226,0.12) 0%, rgba(0,0,0,0) 70%);
+            top: 40%; left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .badge {
+            background: rgba(138, 43, 226, 0.1);
+            color: var(--accent-primary);
+            border: 1px solid rgba(138, 43, 226, 0.2);
+            padding: 6px 16px;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-bottom: 25px;
+            display: inline-block;
+        }
+
+        .hero h1 {
+            /* Tamanho de fonte responsivo */
+            font-size: clamp(2.5rem, 8vw, 4.5rem);
+            margin-bottom: 20px;
+            line-height: 1.1;
+            font-weight: 800;
+            letter-spacing: -2px;
+            background: linear-gradient(180deg, #ffffff 0%, #a0a0a0 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero p {
+            font-size: clamp(1rem, 4vw, 1.2rem);
+            color: #999;
+            max-width: 600px;
+            margin-bottom: 40px;
+            font-weight: 300;
+        }
+
+        .hero-buttons {
+            display: flex; gap: 15px; flex-wrap: wrap; justify-content: center;
+            width: 100%; max-width: 500px;
+        }
+
+        /* --- TECH STACK --- */
+        .tech-stack { margin-top: 80px; text-align: center; width: 100%; }
+        .tech-stack p {
+            font-size: 0.8rem; margin-bottom: 20px; letter-spacing: 2px;
+            text-transform: uppercase; color: #555; font-weight: 600;
+        }
+        .tech-icons {
+            display: flex; justify-content: center; gap: 15px; flex-wrap: wrap;
+        }
+        .tech-tag {
+            border: 1px solid var(--glass-border);
+            background: rgba(255,255,255,0.02);
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 0.85rem; color: #888; font-weight: 500;
+        }
+
+        /* --- SEÇÕES GERAIS --- */
+        section { padding: 100px 5%; max-width: 1200px; margin: 0 auto; }
+
+        .section-header { margin-bottom: 60px; }
+        .section-title { font-size: clamp(2rem, 5vw, 2.5rem); margin-bottom: 10px; letter-spacing: -1px; }
+        .section-desc { color: #888; font-size: 1.1rem; max-width: 500px; }
+
+        /* --- PROJETOS (GRID) --- */
+        .projects-grid {
+            display: grid;
+            /* Responsividade extrema: Ajusta mesmo em telas muito pequenas */
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+        }
+
+        .project-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: 0.3s;
+            display: flex; flex-direction: column;
+        }
+
+        .project-card:hover { border-color: var(--accent-primary); transform: translateY(-5px); }
+
+        .project-thumb {
+            width: 100%; height: 200px; background: #1a1a20;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 3rem; color: #333;
+        }
+        .project-thumb img { width: 100%; height: 100%; object-fit: cover; }
+
+        .project-content { padding: 25px; flex-grow: 1; display: flex; flex-direction: column; }
+        .project-tag {
+            font-size: 0.75rem; color: var(--accent-secondary);
+            text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; font-weight: 700;
+        }
+        .project-title { font-size: 1.3rem; margin-bottom: 10px; color: #fff; }
+        .project-desc { color: #999; margin-bottom: 25px; font-size: 0.9rem; flex-grow: 1; }
+
+        /* --- SERVIÇOS --- */
+        .services-list { display: flex; flex-direction: column; gap: 20px; }
+        .service-row {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 40px; background: var(--glass-bg);
+            border: 1px solid var(--glass-border); border-radius: 12px;
+        }
+        .service-info h3 { font-size: 1.3rem; margin-bottom: 8px; color: #fff; }
+        .service-info p { color: #777; font-size: 0.95rem; }
+        .service-icon { font-size: 1.5rem; color: var(--accent-primary); }
+
+        /* --- CONTATO (FORM) --- */
+        .contact-container {
+            background: linear-gradient(180deg, rgba(26,11,46,0.5) 0%, rgba(10,10,12,0) 100%);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px; padding: 60px 40px;
+            text-align: center; max-width: 700px; margin: 0 auto;
+        }
+
+        .contact-form { display: flex; flex-direction: column; gap: 15px; margin-top: 40px; text-align: left; }
+
+        .form-group input, .form-group textarea {
+            width: 100%; padding: 16px; background: var(--input-bg);
+            border: 1px solid var(--glass-border); border-radius: 8px;
+            color: #fff; font-size: 1rem;
+        }
+        .form-group textarea { resize: vertical; min-height: 120px; }
+
+        /* --- FOOTER --- */
+        footer {
+            border-top: 1px solid var(--glass-border); padding: 40px 5%;
+            margin-top: 60px; display: flex; justify-content: space-between;
+            align-items: center; color: #555; font-size: 0.9rem;
+        }
+
+        /* =========================================
+           MOBILE OPTIMIZATION (MEDIA QUERIES)
+           ========================================= */
+        @media (max-width: 900px) {
+            .desktop-nav { display: none; }
+            .mobile-toggle { display: flex; }
+        }
+
+        @media (max-width: 768px) {
+            /* Ajuste de espaçamento geral */
+            section { padding: 60px 20px; }
+
+            /* Ajuste de botões para serem clicáveis */
+            .hero-buttons { flex-direction: column; gap: 15px; }
+            .btn { width: 100%; }
+
+            /* Ajuste de cards */
+            .project-thumb { height: 180px; }
+
+            /* Serviços viram coluna */
+            .service-row { flex-direction: column; align-items: flex-start; gap: 20px; padding: 30px; }
+            .service-icon { display: none; }
+
+            /* Contato */
+            .contact-container { padding: 40px 20px; }
+
+            /* Footer */
+            footer { flex-direction: column; gap: 20px; text-align: center; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">Beaqme</div>
+
+        <nav class="desktop-nav">
+            <ul>
+                <li><a href="#projetos">Projetos</a></li>
+                <li><a href="#servicos">Serviços</a></li>
+                <li><a href="#contato">Contato</a></li>
+            </ul>
+            <a href="#contato" class="btn btn-outline btn-small">Falar comigo</a>
         </nav>
-      </div>
+
+        <div class="mobile-toggle" onclick="toggleMenu()">
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
+        </div>
     </header>
 
-    <!-- Parallax 1 -->
-    <div
-      class="parallax parallax--top"
-      role="img"
-      aria-label="Equipe trabalhando em projeto digital"
-    ></div>
+    <div class="mobile-menu" id="mobileMenu">
+        <a href="#projetos" onclick="toggleMenu()">Projetos</a>
+        <a href="#servicos" onclick="toggleMenu()">Serviços</a>
+        <a href="#contato" onclick="toggleMenu()">Contato</a>
+        <a href="https://wa.me/seu-numero" class="btn btn-primary" style="width: auto; margin-top: 20px;">WhatsApp</a>
+    </div>
 
-    <main class="container">
-      <!-- era .hero; agora .destaque -->
-      <section class="destaque">
-        <div class="destaque__content">
-          <h2>Seu projeto digital nas mãos certas</h2>
-          <p>
-            Sites e sistemas sob medida: rápidos, acessíveis e responsivos. Do
-            layout ao código, entregamos soluções que funcionam em qualquer
-            dispositivo.
-          </p>
-          <a class="btn" href="#contato">Solicitar orçamento</a>
+    <section class="hero">
+        <div class="hero-glow"></div>
+
+        <div data-aos="fade-down">
+            <span class="badge">Disponível para freelas</span>
         </div>
-        <picture class="destaque__media">
-          <source
-            srcset="
-              https://images.unsplash.com/photo-1551836022-d5d88e9218df?q=80&w=1200&auto=format&fit=crop
-            "
-            media="(min-width: 760px)"
-          />
-          <img
-            src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=1200&auto=format&fit=crop"
-            alt="Prévia de interface em notebook e smartphone"
-            loading="lazy"
-            width="1200"
-            height="800"
-          />
-        </picture>
-      </section>
 
-      <section class="grid">
-        <article class="card">
-          <img
-            class="card__img"
-            src="https://images.unsplash.com/photo-1507679799987-c73779587ccf?q=80&w=800&auto=format&fit=crop"
-            alt=""
-            loading="lazy"
-            width="800"
-            height="600"
-          />
-          <h3>Agilidade</h3>
-          <p>
-            Processo enxuto e prazos realistas. Entregas contínuas, sem novela.
-          </p>
-          <a class="link" href="#">Ver detalhes</a>
-        </article>
-        <article class="card">
-          <img
-            class="card__img"
-            src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?q=80&w=800&auto=format&fit=crop"
-            alt=""
-            loading="lazy"
-            width="800"
-            height="600"
-          />
-          <h3>Qualidade</h3>
-          <p>Acessibilidade, desempenho e UX de verdade. Bonito e funcional.</p>
-          <a class="link" href="#">Nossos diferenciais</a>
-        </article>
-        <article class="card">
-          <img
-            class="card__img"
-            src="https://images.unsplash.com/photo-1529333166437-7750a6dd5a70?q=80&w=800&auto=format&fit=crop"
-            alt=""
-            loading="lazy"
-            width="800"
-            height="600"
-          />
-          <h3>Escalabilidade</h3>
-          <p>Arquitetura preparada para crescer. Sem recomeçar do zero.</p>
-          <a class="link" href="#">Projetos realizados</a>
-        </article>
-      </section>
+        <h1 data-aos="fade-up" data-aos-delay="100">
+            Code. Design.<br>Performance.
+        </h1>
 
-      <section class="cta">
-        <h2>Pronto para publicar?</h2>
-        <p>
-          Cuidamos de tudo: planejamento, desenvolvimento e deploy. Você foca no
-          negócio.
+        <p data-aos="fade-up" data-aos-delay="200">
+            Especialista em criar ecossistemas digitais. Sites rápidos e sistemas que funcionam.
         </p>
-        <button class="btn btn--ghost" id="contato">Falar com a Beaqme</button>
-      </section>
-    </main>
 
-    <!-- Parallax 2 -->
-    <div
-      class="parallax parallax--bottom"
-      role="img"
-      aria-label="Textura geométrica em tons escuros"
-    ></div>
+        <div class="hero-buttons" data-aos="fade-up" data-aos-delay="300">
+            <a href="#projetos" class="btn btn-primary">Ver Portfólio</a>
+            <a href="https://wa.me/seu-numero-aqui" target="_blank" class="btn btn-outline">Chamar no Zap</a>
+        </div>
 
-    <footer class="site-footer">
-      <div class="container">
-        <small>© 2025 Beaqme • Desenvolvimento sob medida</small>
-      </div>
+        <div class="tech-stack" data-aos="fade-in" data-aos-delay="500">
+            <p>Tecnologias</p>
+            <div class="tech-icons">
+                <span class="tech-tag">React</span>
+                <span class="tech-tag">Next.js</span>
+                <span class="tech-tag">Node</span>
+                <span class="tech-tag">Python</span>
+                <span class="tech-tag">AWS</span>
+            </div>
+        </div>
+    </section>
+
+    <section id="projetos">
+        <div class="section-header" data-aos="fade-right">
+            <h2 class="section-title">Ecossistema</h2>
+            <p class="section-desc">Meus aplicativos e projetos recentes.</p>
+        </div>
+
+        <div class="projects-grid">
+            <article class="project-card" data-aos="fade-up">
+                <div class="project-thumb">🚀</div>
+                <div class="project-content">
+                    <span class="project-tag">SaaS / B2B</span>
+                    <h3 class="project-title">Nome do App 01</h3>
+                    <p class="project-desc">Plataforma de gestão financeira automatizada para pequenas empresas.</p>
+                    <a href="#" class="btn btn-outline btn-small">Acessar</a>
+                </div>
+            </article>
+
+            <article class="project-card" data-aos="fade-up" data-aos-delay="100">
+                <div class="project-thumb">📱</div>
+                <div class="project-content">
+                    <span class="project-tag">Mobile / Utility</span>
+                    <h3 class="project-title">Nome do App 02</h3>
+                    <p class="project-desc">App focado em produtividade pessoal com IA.</p>
+                    <a href="#" class="btn btn-outline btn-small">Em breve</a>
+                </div>
+            </article>
+
+            <article class="project-card" data-aos="fade-up" data-aos-delay="200">
+                <div class="project-thumb">🤖</div>
+                <div class="project-content">
+                    <span class="project-tag">Automação</span>
+                    <h3 class="project-title">Bot Service</h3>
+                    <p class="project-desc">Automação de atendimento via WhatsApp.</p>
+                    <a href="#" class="btn btn-outline btn-small">Ver Demo</a>
+                </div>
+            </article>
+        </div>
+    </section>
+
+    <section id="servicos">
+        <div class="section-header" data-aos="fade-right">
+            <h2 class="section-title">Serviços</h2>
+            <p class="section-desc">Como posso impulsionar seu negócio.</p>
+        </div>
+
+        <div class="services-list">
+            <div class="service-row" data-aos="fade-left">
+                <div class="service-info">
+                    <h3>Desenvolvimento Full-Stack</h3>
+                    <p>Construção de aplicações completas (Web & Mobile).</p>
+                </div>
+                <div class="service-icon">⚡</div>
+            </div>
+
+            <div class="service-row" data-aos="fade-left" data-aos-delay="100">
+                <div class="service-info">
+                    <h3>Refatoração & Performance</h3>
+                    <p>Otimização de sistemas legados.</p>
+                </div>
+                <div class="service-icon">🛠</div>
+            </div>
+        </div>
+    </section>
+
+    <section id="contato">
+        <div class="contact-container" data-aos="zoom-in">
+            <h2 class="section-title">Vamos conversar?</h2>
+            <p style="color:#aaa;">Preencha abaixo e responderei hoje mesmo.</p>
+
+            <form action="https://formspree.io/f/SEU_CODIGO_AQUI" method="POST" class="contact-form">
+                <div class="form-group">
+                    <input type="email" name="email" placeholder="Seu e-mail" required>
+                </div>
+                <div class="form-group">
+                    <textarea name="message" placeholder="Fale sobre seu projeto..." required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width:100%">Enviar Mensagem</button>
+            </form>
+        </div>
+    </section>
+
+    <footer>
+        <div class="logo" style="font-size: 1.2rem;">Beaqme</div>
+        <p>© 2026 Beaqme Development.</p>
     </footer>
-  </body>
+
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        // Inicia Animações
+        AOS.init({
+            duration: 800,
+            once: true,
+            offset: 50 // Inicia animação mais cedo no mobile
+        });
+
+        // Script do Menu Mobile
+        function toggleMenu() {
+            const menu = document.getElementById('mobileMenu');
+            const bars = document.querySelectorAll('.bar');
+
+            menu.classList.toggle('active');
+
+            // Efeito visual no ícone hambúrguer (opcional)
+            if (menu.classList.contains('active')) {
+                bars[0].style.transform = "rotate(45deg) translate(5px, 5px)";
+                bars[1].style.opacity = "0";
+                bars[2].style.transform = "rotate(-45deg) translate(5px, -5px)";
+            } else {
+                bars[0].style.transform = "none";
+                bars[1].style.opacity = "1";
+                bars[2].style.transform = "none";
+            }
+        }
+    </script>
+</body>
 </html>
