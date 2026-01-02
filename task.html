@@ -2,110 +2,438 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Task AI | Project Manager</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Task AI | Intelligent Workspace</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+
     <style>
-        :root { --bg: #0f172a; --card: #1e293b; --text: #f8fafc; --primary: #3b82f6; }
+        :root {
+            --bg-body: #0f1115;
+            --bg-sidebar: #16191d;
+            --bg-column: #16191d;
+            --bg-card: #20242a;
+            --bg-hover: #2a2f36;
+            --border: #2f343c;
+            --text-primary: #ecedee;
+            --text-secondary: #9ea2a8;
+            --accent: #5e6ad2; /* Indigo estilo Linear/Jira */
+            --accent-glow: rgba(94, 106, 210, 0.4);
+            --success: #2da44e;
+            --warning: #d29922;
+            --danger: #cf222e;
+        }
+
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
-        body { background: var(--bg); color: var(--text); height: 100vh; display: flex; flex-direction: column; }
 
-        /* Navbar */
-        nav { padding: 15px 30px; background: #1e293b; border-bottom: 1px solid #334155; display: flex; justify-content: space-between; align-items: center; }
-        .logo { font-weight: 700; font-size: 1.2rem; color: var(--primary); display: flex; align-items: center; gap: 8px; }
-        .back-btn { color: #94a3b8; text-decoration: none; font-size: 0.9rem; }
-        .back-btn:hover { color: #fff; }
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-primary);
+            height: 100vh;
+            display: flex;
+            overflow: hidden;
+        }
 
-        /* Layout Kanban */
-        .board { display: flex; gap: 20px; padding: 30px; overflow-x: auto; height: 100%; }
+        /* --- SIDEBAR --- */
+        .sidebar {
+            width: 240px;
+            background: var(--bg-sidebar);
+            border-right: 1px solid var(--border);
+            display: flex; flex-direction: column;
+            padding: 20px 15px;
+            transition: 0.3s;
+        }
+
+        .brand {
+            font-weight: 700; font-size: 1.1rem; display: flex; align-items: center; gap: 10px;
+            margin-bottom: 30px; color: #fff;
+        }
+        .brand-icon {
+            width: 28px; height: 28px; background: linear-gradient(135deg, var(--accent), #8b5cf6);
+            border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;
+        }
+
+        .menu-item {
+            display: flex; align-items: center; gap: 12px;
+            padding: 10px 12px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 6px;
+            margin-bottom: 4px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .menu-item:hover, .menu-item.active {
+            background: var(--bg-hover); color: #fff;
+        }
+        .menu-item .material-icons-round { font-size: 1.2rem; }
+
+        .sidebar-footer { margin-top: auto; padding-top: 20px; border-top: 1px solid var(--border); }
+        
+        /* --- MAIN CONTENT --- */
+        .main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+
+        /* HEADER */
+        header {
+            height: 64px;
+            border-bottom: 1px solid var(--border);
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0 30px;
+            background: var(--bg-body);
+        }
+
+        .header-left h1 { font-size: 1.2rem; font-weight: 600; }
+        .header-left p { font-size: 0.85rem; color: var(--text-secondary); }
+
+        .ai-btn {
+            background: linear-gradient(90deg, var(--accent), #7c3aed);
+            color: white; border: none; padding: 8px 16px; border-radius: 6px;
+            font-weight: 600; font-size: 0.85rem; cursor: pointer;
+            display: flex; align-items: center; gap: 8px;
+            box-shadow: 0 0 15px var(--accent-glow);
+            transition: 0.3s;
+        }
+        .ai-btn:hover { transform: translateY(-2px); box-shadow: 0 0 25px var(--accent-glow); }
+        .spin { animation: spin 1s linear infinite; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        /* --- KANBAN BOARD --- */
+        .board {
+            flex: 1;
+            display: flex;
+            overflow-x: auto;
+            padding: 30px;
+            gap: 20px;
+            align-items: flex-start; /* Importante para altura das colunas */
+        }
 
         .column {
-            background: #1e293b; min-width: 300px; border-radius: 12px; padding: 15px;
-            display: flex; flex-direction: column; gap: 15px; border: 1px solid #334155;
+            min-width: 320px;
+            width: 320px;
+            background: var(--bg-column);
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            display: flex; flex-direction: column;
+            max-height: 100%;
         }
 
-        .col-header { font-weight: 600; color: #94a3b8; display: flex; justify-content: space-between; }
-        .badge { background: #334155; padding: 2px 8px; border-radius: 12px; font-size: 0.8rem; }
-
-        /* Task Cards */
-        .task {
-            background: #334155; padding: 15px; border-radius: 8px; cursor: grab;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: 0.2s; position: relative;
+        .col-header {
+            padding: 15px;
+            font-weight: 600; font-size: 0.9rem; color: var(--text-secondary);
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 1px solid var(--border);
         }
-        .task:hover { transform: translateY(-3px); background: #475569; }
-        .task-tag { font-size: 0.7rem; padding: 4px 8px; border-radius: 4px; text-transform: uppercase; font-weight: bold; margin-bottom: 8px; display: inline-block; }
-        .tag-dev { background: rgba(59, 130, 246, 0.2); color: #60a5fa; }
-        .tag-design { background: rgba(236, 72, 153, 0.2); color: #f472b6; }
-        .tag-high { background: rgba(239, 68, 68, 0.2); color: #f87171; }
+        .counter { background: var(--bg-hover); padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; }
 
-        .task h4 { font-size: 1rem; margin-bottom: 5px; }
-        .task p { font-size: 0.85rem; color: #cbd5e1; }
-        .avatars { display: flex; margin-top: 10px; }
-        .avatar { width: 25px; height: 25px; background: #64748b; border-radius: 50%; border: 2px solid #334155; margin-left: -8px; }
-
-        /* Botão AI */
-        .ai-btn {
-            background: linear-gradient(90deg, #6366f1, #8b5cf6); border: none; padding: 8px 16px;
-            border-radius: 6px; color: white; cursor: pointer; font-weight: 600; font-size: 0.9rem;
-            box-shadow: 0 0 15px rgba(99, 102, 241, 0.4);
+        .col-body {
+            padding: 10px;
+            overflow-y: auto;
+            flex: 1;
+            min-height: 100px; /* Área de drop garantida */
+            display: flex; flex-direction: column; gap: 10px;
         }
-        .ai-btn:hover { box-shadow: 0 0 25px rgba(99, 102, 241, 0.6); }
 
+        /* CARD STYLE */
+        .task-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 15px;
+            cursor: grab;
+            transition: 0.2s;
+            position: relative;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        
+        .task-card:hover { border-color: #555; transform: translateY(-2px); }
+        .task-card:active { cursor: grabbing; }
+        .task-card.dragging { opacity: 0.5; border: 1px dashed var(--text-secondary); }
+
+        /* Tags */
+        .tags { display: flex; gap: 6px; margin-bottom: 10px; flex-wrap: wrap; }
+        .tag {
+            font-size: 0.7rem; padding: 2px 8px; border-radius: 4px;
+            font-weight: 600; text-transform: uppercase;
+        }
+        .tag-dev { background: rgba(56, 189, 248, 0.15); color: #38bdf8; }
+        .tag-design { background: rgba(244, 114, 182, 0.15); color: #f472b6; }
+        .tag-bug { background: rgba(248, 113, 113, 0.15); color: #f87171; }
+        .tag-ai { background: rgba(139, 92, 246, 0.15); color: #a78bfa; border: 1px solid rgba(139, 92, 246, 0.3); }
+
+        .task-title { font-size: 0.95rem; margin-bottom: 8px; line-height: 1.4; font-weight: 500; }
+        
+        .task-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 12px; }
+        .avatar { width: 24px; height: 24px; border-radius: 50%; background: #555; font-size: 0.7rem; display: flex; align-items: center; justify-content: center; color: #fff; border: 2px solid var(--bg-card); }
+        .priority-icon { font-size: 1rem; color: var(--text-secondary); }
+        .priority-high { color: var(--danger); }
+
+        /* Toast Notification */
+        .toast {
+            position: fixed; bottom: 30px; right: 30px;
+            background: #2da44e; color: white; padding: 12px 24px;
+            border-radius: 8px; box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+            display: flex; align-items: center; gap: 10px;
+            transform: translateY(100px); opacity: 0; transition: 0.4s; z-index: 1000;
+        }
+        .toast.show { transform: translateY(0); opacity: 1; }
+
+        /* RESPONSIVE */
+        @media (max-width: 900px) {
+            .sidebar { display: none; } /* Esconde menu lateral */
+            .main { width: 100%; }
+            header { padding: 0 15px; }
+            .board { 
+                padding: 15px; gap: 15px; 
+                scroll-snap-type: x mandatory; /* Snap ao rolar no mobile */
+            }
+            .column { 
+                width: 85vw; /* Coluna ocupa quase a tela toda */
+                min-width: 85vw;
+                scroll-snap-align: center;
+            }
+            .task-card:active { transform: scale(0.98); } /* Feedback tátil */
+        }
     </style>
 </head>
 <body>
-    <nav>
-        <div class="logo">⚡ Task AI Flow</div>
-        <div>
-            <button class="ai-btn">✨ Ask AI Assistant</button>
-            <a href="index.html" class="back-btn" style="margin-left: 20px;">Voltar</a>
+
+    <nav class="sidebar">
+        <div class="brand">
+            <div class="brand-icon">⚡</div> Task AI
+        </div>
+        
+        <div style="flex:1">
+            <a href="#" class="menu-item active">
+                <span class="material-icons-round">dashboard</span> Board
+            </a>
+            <a href="#" class="menu-item">
+                <span class="material-icons-round">list</span> List View
+            </a>
+            <a href="#" class="menu-item">
+                <span class="material-icons-round">timeline</span> Roadmap
+            </a>
+            <div style="height: 20px;"></div>
+            <p style="padding: 0 12px; font-size: 0.75rem; text-transform: uppercase; color: #555; margin-bottom: 10px; font-weight: 700;">Workspace</p>
+            <a href="#" class="menu-item">
+                <span class="material-icons-round">folder_open</span> Projects
+            </a>
+            <a href="#" class="menu-item">
+                <span class="material-icons-round">people</span> Team
+            </a>
+        </div>
+
+        <div class="sidebar-footer">
+            <a href="index.html" class="menu-item">
+                <span class="material-icons-round">arrow_back</span> Voltar ao Site
+            </a>
         </div>
     </nav>
 
-    <div class="board">
-        <div class="column">
-            <div class="col-header">TO DO <span class="badge">3</span></div>
+    <div class="main">
+        <header>
+            <div class="header-left">
+                <h1>Desenvolvimento SaaS</h1>
+                <p>Sprint 24 • Finaliza em 2 dias</p>
+            </div>
+            <div>
+                <button class="ai-btn" onclick="optimizeBoard()">
+                    <span class="material-icons-round" id="aiIcon">auto_awesome</span>
+                    <span id="aiText">AI Optimize</span>
+                </button>
+            </div>
+        </header>
 
-            <div class="task">
-                <span class="task-tag tag-high">Alta Prioridade</span>
-                <h4>Integração API Stripe</h4>
-                <p>Configurar webhooks para pagamentos recorrentes.</p>
-                <div class="avatars"><div class="avatar"></div><div class="avatar"></div></div>
+        <div class="board">
+            
+            <div class="column">
+                <div class="col-header">
+                    <span>TO DO</span> <span class="counter" id="count-todo">3</span>
+                </div>
+                <div class="col-body" id="todo" ondrop="drop(event)" ondragover="allowDrop(event)">
+                    
+                    <div class="task-card" draggable="true" ondragstart="drag(event)" id="task1">
+                        <div class="tags"><span class="tag tag-dev">Backend</span></div>
+                        <div class="task-title">Configurar AWS Lambda para processamento de imagens</div>
+                        <div class="task-footer">
+                            <div class="avatar" style="background: #e91e63">JS</div>
+                            <span class="material-icons-round priority-icon priority-high">flag</span>
+                        </div>
+                    </div>
+
+                    <div class="task-card" draggable="true" ondragstart="drag(event)" id="task2">
+                        <div class="tags"><span class="tag tag-design">UI/UX</span></div>
+                        <div class="task-title">Criar ícones para a nova sidebar</div>
+                        <div class="task-footer">
+                            <div class="avatar" style="background: #3f51b5">MA</div>
+                            <span class="material-icons-round priority-icon">flag</span>
+                        </div>
+                    </div>
+
+                     <div class="task-card" draggable="true" ondragstart="drag(event)" id="task3">
+                        <div class="tags"><span class="tag tag-dev">Database</span></div>
+                        <div class="task-title">Migração do banco de dados PostgreSQL</div>
+                        <div class="task-footer">
+                            <div class="avatar" style="background: #009688">RT</div>
+                            <span class="material-icons-round priority-icon priority-high">flag</span>
+                        </div>
+                    </div>
+
+                </div>
             </div>
 
-            <div class="task">
-                <span class="task-tag tag-design">Design</span>
-                <h4>Novo Dashboard</h4>
-                <p>Criar protótipo no Figma da tela de analytics.</p>
-                <div class="avatars"><div class="avatar"></div></div>
-            </div>
-        </div>
+            <div class="column">
+                <div class="col-header">
+                    <span>IN PROGRESS</span> <span class="counter" id="count-progress">2</span>
+                </div>
+                <div class="col-body" id="progress" ondrop="drop(event)" ondragover="allowDrop(event)">
+                    
+                    <div class="task-card" draggable="true" ondragstart="drag(event)" id="task4">
+                        <div class="tags"><span class="tag tag-bug">Fix</span></div>
+                        <div class="task-title">Erro de autenticação no Login Social (Google)</div>
+                        <div class="task-footer">
+                            <div class="avatar" style="background: #ff5722">DL</div>
+                            <span class="material-icons-round priority-icon priority-high">flag</span>
+                        </div>
+                    </div>
 
-        <div class="column">
-            <div class="col-header">IN PROGRESS <span class="badge">2</span></div>
+                    <div class="task-card" draggable="true" ondragstart="drag(event)" id="task5">
+                        <div class="tags"><span class="tag tag-dev">Frontend</span></div>
+                        <div class="task-title">Implementar Dark Mode toggle</div>
+                        <div class="task-footer">
+                            <div class="avatar" style="background: #e91e63">JS</div>
+                            <span class="material-icons-round priority-icon">flag</span>
+                        </div>
+                    </div>
 
-            <div class="task">
-                <span class="task-tag tag-dev">Backend</span>
-                <h4>Otimização DB</h4>
-                <p>Refatorar queries SQL para reduzir latência em 40%.</p>
-                <div class="avatars"><div class="avatar"></div><div class="avatar"></div></div>
+                </div>
             </div>
 
-            <div class="task" style="border: 1px solid #8b5cf6;">
-                <span class="task-tag" style="background:#8b5cf6; color:white;">AI Generated</span>
-                <h4>Sugestão: Cache Redis</h4>
-                <p>Implementar cache para sessão de usuários.</p>
-            </div>
-        </div>
+            <div class="column">
+                <div class="col-header">
+                    <span>DONE</span> <span class="counter" id="count-done">1</span>
+                </div>
+                <div class="col-body" id="done" ondrop="drop(event)" ondragover="allowDrop(event)">
+                    
+                    <div class="task-card" draggable="true" ondragstart="drag(event)" id="task6" style="opacity: 0.6">
+                        <div class="tags"><span class="tag tag-design">Design</span></div>
+                        <div class="task-title">Wireframes da tela de Dashboard</div>
+                        <div class="task-footer">
+                            <div class="avatar" style="background: #3f51b5">MA</div>
+                            <span class="material-icons-round priority-icon" style="color: var(--success)">check_circle</span>
+                        </div>
+                    </div>
 
-        <div class="column">
-            <div class="col-header">DONE <span class="badge">5</span></div>
-            <div class="task" style="opacity: 0.6;">
-                <span class="task-tag tag-dev">Fix</span>
-                <h4>Bug Login Mobile</h4>
-                <p>Corrigido erro de overflow no iPhone 13.</p>
+                </div>
             </div>
+
         </div>
     </div>
+
+    <div class="toast" id="toast">
+        <span class="material-icons-round">check_circle</span>
+        <div>
+            <strong>AI Optimization Complete</strong><br>
+            <span style="font-size: 0.8rem; opacity: 0.9">Tasks re-prioritized based on velocity.</span>
+        </div>
+    </div>
+
+    <script>
+        // --- DRAG AND DROP LOGIC ---
+        function allowDrop(ev) {
+            ev.preventDefault();
+        }
+
+        function drag(ev) {
+            ev.dataTransfer.setData("text", ev.target.id);
+            ev.target.classList.add('dragging');
+        }
+
+        function drop(ev) {
+            ev.preventDefault();
+            var data = ev.dataTransfer.getData("text");
+            var draggedElement = document.getElementById(data);
+            
+            // Remove dragging class
+            draggedElement.classList.remove('dragging');
+
+            // Find the closest column body to drop into
+            var targetColumn = ev.target.closest('.col-body');
+            
+            if (targetColumn) {
+                targetColumn.appendChild(draggedElement);
+                updateCounters();
+            }
+        }
+
+        // Remove dragging class if drag ends without drop
+        document.addEventListener('dragend', function(e) {
+            if(e.target.classList.contains('task-card')) {
+                e.target.classList.remove('dragging');
+            }
+        });
+
+        // --- COUNTER UPDATE LOGIC ---
+        function updateCounters() {
+            document.getElementById('count-todo').innerText = document.getElementById('todo').children.length;
+            document.getElementById('count-progress').innerText = document.getElementById('progress').children.length;
+            document.getElementById('count-done').innerText = document.getElementById('done').children.length;
+        }
+
+        // --- AI SIMULATION LOGIC ---
+        function optimizeBoard() {
+            const btn = document.querySelector('.ai-btn');
+            const icon = document.getElementById('aiIcon');
+            const text = document.getElementById('aiText');
+
+            // 1. Loading State
+            icon.innerText = 'sync';
+            icon.classList.add('spin');
+            text.innerText = 'Analyzing...';
+            btn.style.opacity = '0.7';
+
+            setTimeout(() => {
+                // 2. Action: Create a new "AI Task"
+                const newCard = document.createElement('div');
+                newCard.className = 'task-card';
+                newCard.draggable = true;
+                newCard.id = 'task-ai-' + Date.now();
+                newCard.innerHTML = `
+                    <div class="tags">
+                        <span class="tag tag-ai">AI Suggested</span>
+                        <span class="tag tag-bug">Critical</span>
+                    </div>
+                    <div class="task-title">Refatorar API de Login para reduzir latência em 200ms</div>
+                    <div class="task-footer">
+                        <div class="avatar" style="background: linear-gradient(135deg, #5e6ad2, #8b5cf6)">AI</div>
+                        <span class="material-icons-round priority-icon priority-high">flag</span>
+                    </div>
+                `;
+                
+                // Add to 'To Do' column with animation
+                const todoCol = document.getElementById('todo');
+                todoCol.insertBefore(newCard, todoCol.firstChild); // Add to top
+                
+                // Reset Button
+                icon.innerText = 'auto_awesome';
+                icon.classList.remove('spin');
+                text.innerText = 'AI Optimize';
+                btn.style.opacity = '1';
+
+                updateCounters();
+                showToast();
+
+            }, 2000); // 2 seconds delay
+        }
+
+        function showToast() {
+            const toast = document.getElementById('toast');
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 4000);
+        }
+    </script>
 </body>
 </html>
