@@ -2,462 +2,399 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Beaqme Pro | Trading Terminal</title>
-    
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Roboto+Mono:wght@400;600&display=swap" rel="stylesheet">
-    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Beaqme Finance | Market Intelligence</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 
     <style>
         :root {
-            --bg-body: #0b0e11;      /* Fundo estilo Binance/Kraken */
-            --bg-card: #151a1e;      /* Fundo dos painéis */
-            --bg-hover: #1e2329;
-            --text-primary: #eaecef;
-            --text-secondary: #848e9c;
-            --up-color: #00e676;     /* Verde Financeiro */
-            --down-color: #ff1744;   /* Vermelho Financeiro */
-            --border: #2b3139;
-            --accent: #8a2be2;
+            /* Palette Dark Premium */
+            --bg-app: #0f1115;
+            --bg-sidebar: #090a0d;
+            --bg-card: #16191d;
+            --bg-hover: #1e2229;
+            --border: #252a33;
+
+            --text-main: #e1e3e6;
+            --text-muted: #848e9c;
+
+            /* Finance Colors */
+            --up: #00c087;      /* Green */
+            --down: #fd4d4d;    /* Red */
+            --accent: #3772ff;  /* Brand Blue */
+            --gold: #ffb119;    /* Gold/Warning */
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: var(--bg-app); color: var(--text-main); font-family: 'Inter', sans-serif; height: 100vh; display: flex; overflow: hidden; }
 
-        body {
-            background-color: var(--bg-body);
-            color: var(--text-primary);
-            font-family: 'Inter', sans-serif;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden; /* App feel */
-        }
+        /* Typography Utilities */
+        .num { font-family: 'Roboto Mono', monospace; }
+        .text-up { color: var(--up); }
+        .text-down { color: var(--down); }
+        .text-muted { color: var(--text-muted); }
 
-        /* TIPOGRAFIA FINANCEIRA */
-        .price-text, .numbers { font-family: 'Roboto Mono', monospace; }
-        .green { color: var(--up-color); }
-        .red { color: var(--down-color); }
+        /* --- SIDEBAR --- */
+        .sidebar { width: 240px; background: var(--bg-sidebar); border-right: 1px solid var(--border); display: flex; flex-direction: column; flex-shrink: 0; transition: width 0.3s; }
+        .logo { height: 64px; display: flex; align-items: center; padding: 0 24px; font-weight: 800; font-size: 1.2rem; letter-spacing: -0.5px; border-bottom: 1px solid var(--border); color: #fff; gap: 8px; }
+        .nav { padding: 20px 12px; flex: 1; display: flex; flex-direction: column; gap: 4px; }
 
-        /* --- LAYOUT GRID (O Segredo do Profissional) --- */
-        .app-container {
-            display: flex;
-            height: 100%;
-            width: 100%;
-        }
-
-        /* --- SIDEBAR (Navegação) --- */
-        .sidebar {
-            width: 60px;
-            background: #000;
-            border-right: 1px solid var(--border);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding-top: 20px;
-            gap: 20px;
-            z-index: 10;
-        }
-
-        .sidebar-icon {
-            width: 36px; height: 36px;
-            border-radius: 8px;
-            display: flex; align-items: center; justify-content: center;
-            color: var(--text-secondary);
-            cursor: pointer; transition: 0.2s;
-        }
-        .sidebar-icon:hover, .sidebar-icon.active {
-            background: var(--bg-hover); color: var(--accent);
-        }
-        .sidebar-icon.active { border-left: 3px solid var(--accent); }
+        .nav-item { display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: 8px; color: var(--text-muted); cursor: pointer; transition: 0.2s; font-size: 0.9rem; font-weight: 500; text-decoration: none; }
+        .nav-item:hover, .nav-item.active { background: var(--bg-hover); color: #fff; }
+        .nav-item.active { border-left: 3px solid var(--accent); }
+        .nav-category { padding: 20px 12px 10px 12px; font-size: 0.75rem; color: #555; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
 
         /* --- MAIN CONTENT --- */
-        .main-content {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            overflow-y: auto;
+        .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+        /* Top Bar */
+        .topbar { height: 64px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 30px; background: var(--bg-app); }
+        .search-box { display: flex; align-items: center; background: var(--bg-card); padding: 8px 15px; border-radius: 8px; border: 1px solid var(--border); width: 300px; color: var(--text-muted); gap: 10px; }
+        .search-box input { background: transparent; border: none; outline: none; color: #fff; width: 100%; }
+        .user-profile { display: flex; align-items: center; gap: 15px; }
+        .avatar { width: 36px; height: 36px; background: #252a33; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--accent); font-weight: bold; border: 1px solid var(--border); }
+
+        /* Dashboard Grid */
+        .content-scroll { flex: 1; overflow-y: auto; padding: 30px; }
+        .grid-container { display: grid; grid-template-columns: 3fr 1fr; gap: 30px; max-width: 1600px; margin: 0 auto; }
+
+        /* Market Overview Cards */
+        .overview-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 30px; }
+        .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; position: relative; }
+        .card h3 { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 5px; font-weight: 500; }
+        .big-val { font-size: 1.8rem; font-weight: 700; margin-bottom: 5px; }
+
+        /* Asset Table */
+        .table-container { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+        .table-header { padding: 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+        .tabs { display: flex; gap: 20px; }
+        .tab { cursor: pointer; padding-bottom: 5px; color: var(--text-muted); font-size: 0.9rem; font-weight: 600; }
+        .tab.active { color: #fff; border-bottom: 2px solid var(--accent); }
+
+        table { width: 100%; border-collapse: collapse; }
+        th { text-align: left; padding: 15px 20px; color: var(--text-muted); font-size: 0.8rem; border-bottom: 1px solid var(--border); font-weight: 500; }
+        td { padding: 15px 20px; border-bottom: 1px solid var(--border); font-size: 0.9rem; }
+        tr:last-child td { border-bottom: none; }
+        tr:hover { background: var(--bg-hover); }
+
+        .asset-icon { width: 32px; height: 32px; border-radius: 50%; margin-right: 12px; vertical-align: middle; }
+
+        .btn-small { padding: 6px 14px; border-radius: 6px; border: 1px solid var(--border); background: transparent; color: #fff; cursor: pointer; font-size: 0.8rem; transition: 0.2s; }
+        .btn-small:hover { border-color: var(--accent); color: var(--accent); }
+        .btn-trade { background: rgba(55, 114, 255, 0.1); color: var(--accent); border: none; font-weight: 600; }
+        .btn-trade:hover { background: var(--accent); color: #fff; }
+
+        /* RIGHT PANEL: AI & Insights */
+        .right-panel { display: flex; flex-direction: column; gap: 20px; }
+
+        .signal-card { background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 12px; padding: 15px; cursor: pointer; transition: 0.2s; position: relative; overflow: hidden; }
+        .signal-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+        .signal-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--text-muted); }
+        .signal-card.buy::before { background: var(--up); }
+        .signal-card.sell::before { background: var(--down); }
+
+        .confidence-pill { font-size: 0.7rem; padding: 2px 8px; border-radius: 4px; background: #333; float: right; }
+
+        /* Market Sentiment Bar */
+        .sentiment-track { height: 6px; background: #333; border-radius: 3px; margin: 10px 0; overflow: hidden; display: flex; }
+        .sent-segment { height: 100%; }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .grid-container { grid-template-columns: 1fr; }
+            .overview-cards { grid-template-columns: 1fr; }
         }
-
-        /* HEADER */
-        header {
-            height: 60px;
-            border-bottom: 1px solid var(--border);
-            background: var(--bg-card);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 20px;
-        }
-
-        .market-info { display: flex; gap: 30px; align-items: center; }
-        .pair-selector { font-weight: 700; font-size: 1.1rem; display: flex; gap: 10px; align-items: center; cursor: pointer; }
-        .live-price { font-size: 1.2rem; font-weight: 600; }
-        
-        .user-actions { display: flex; gap: 15px; align-items: center; }
-        .btn { padding: 8px 16px; border-radius: 4px; font-size: 0.85rem; font-weight: 600; cursor: pointer; border: none; }
-        .btn-deposit { background: var(--up-color); color: #000; }
-        .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text-primary); }
-
-        /* DASHBOARD GRID */
-        .dashboard-grid {
-            display: grid;
-            grid-template-columns: 250px 1fr 280px; /* Sidebar de Ativos | Gráfico | Order Book */
-            grid-template-rows: 1fr 250px; /* Gráfico | Histórico Recente */
-            height: calc(100vh - 60px);
-            overflow: hidden;
-        }
-
-        .panel {
-            border-right: 1px solid var(--border);
-            border-bottom: 1px solid var(--border);
-            background: var(--bg-body);
-            overflow: hidden;
-            display: flex; flex-direction: column;
-        }
-        .panel-header {
-            padding: 10px 15px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            color: var(--text-secondary);
-            border-bottom: 1px solid var(--border);
-            text-transform: uppercase;
-            display: flex; justify-content: space-between;
-        }
-
-        /* ASSET LIST (Esquerda) */
-        .asset-row {
-            display: flex; justify-content: space-between;
-            padding: 10px 15px; cursor: pointer;
-            border-bottom: 1px solid rgba(255,255,255,0.02);
-        }
-        .asset-row:hover { background: var(--bg-hover); }
-        .asset-row span { font-size: 0.85rem; }
-
-        /* CHART AREA (Centro) */
-        .chart-container { position: relative; width: 100%; height: 100%; }
-
-        /* ORDER BOOK (Direita) */
-        .order-book { display: flex; flex-direction: column; font-family: 'Roboto Mono'; font-size: 0.8rem; }
-        .ob-row { display: flex; justify-content: space-between; padding: 2px 15px; position: relative; }
-        .ob-row:hover { background: var(--bg-hover); }
-        
-        /* Baratinha de profundidade visual no order book */
-        .depth-bar {
-            position: absolute; top: 0; right: 0; bottom: 0;
-            opacity: 0.15; z-index: 0;
-        }
-        .bg-red { background-color: var(--down-color); }
-        .bg-green { background-color: var(--up-color); }
-        .ob-data { z-index: 1; position: relative; display: flex; justify-content: space-between; width: 100%; }
-
-        /* TRADE HISTORY (Rodapé) */
-        .trade-history { grid-column: 2 / span 1; display: flex; flex-direction: column; }
-        .trade-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
-        .trade-table th { text-align: left; color: var(--text-secondary); padding: 8px 15px; font-weight: 400; }
-        .trade-table td { padding: 6px 15px; border-bottom: 1px solid var(--border); }
-
-        /* --- RESPONSIVIDADE (MOBILE) --- */
-        @media (max-width: 900px) {
-            .sidebar { display: none; } /* Esconde sidebar lateral no mobile */
-            
-            body { overflow-y: auto; height: auto; }
-            .dashboard-grid {
-                display: flex;
-                flex-direction: column;
-                height: auto;
-            }
-
-            .panel { height: auto; border-right: none; }
-            
-            /* Ordem de exibição no celular */
-            .chart-panel { order: 1; height: 350px; }
-            .order-book-panel { order: 2; height: 300px; }
-            .assets-panel { order: 3; display: none; } /* Esconde lista de ativos no mobile pra limpar */
-            .trades-panel { order: 4; display: none; }
-            
-            header { padding: 0 10px; }
-            .market-info { gap: 10px; }
-            .market-stats { display: none; }
-            
-            /* Ajuste Order Book Mobile */
-            .order-book { flex-direction: row; height: 300px; }
-            .asks, .bids { flex: 1; display: flex; flex-direction: column; }
+        @media (max-width: 768px) {
+            .sidebar { display: none; }
+            .topbar { padding: 0 15px; }
+            .content-scroll { padding: 15px; }
+            .search-box { display: none; }
         }
     </style>
 </head>
 <body>
 
-    <div class="app-container">
-        <nav class="sidebar">
-            <a href="index.html" class="sidebar-icon" title="Voltar ao Site">🏠</a>
-            <div class="sidebar-icon active" title="Trade">📊</div>
-            <div class="sidebar-icon" title="Futures">📈</div>
-            <div class="sidebar-icon" title="Wallet">💼</div>
-            <div class="sidebar-icon" title="Settings">⚙️</div>
-        </nav>
+    <aside class="sidebar">
+        <div class="logo">
+            <span class="material-icons-round" style="color: var(--accent);">analytics</span>
+            Beaqme Finance
+        </div>
 
-        <div class="main-content">
-            <header>
-                <div class="market-info">
-                    <div class="pair-selector">
-                        <img src="https://cryptologos.cc/logos/bitcoin-btc-logo.png" width="24" alt="BTC">
-                        BTC/USDT
-                        <span style="font-size: 0.8rem; color: #666;">▼</span>
+        <div class="nav">
+            <div class="nav-category">Menu Principal</div>
+            <a href="#" class="nav-item active"><span class="material-icons-round">dashboard</span> Mercado</a>
+            <a href="#" class="nav-item"><span class="material-icons-round">pie_chart</span> Portfolio</a>
+            <a href="#" class="nav-item"><span class="material-icons-round">rss_feed</span> Notícias IA</a>
+
+            <div class="nav-category">Ferramentas</div>
+            <a href="#" class="nav-item"><span class="material-icons-round">screen_search_desktop</span> Screener</a>
+            <a href="#" class="nav-item"><span class="material-icons-round">psychology</span> Advisor Bot</a>
+
+            <div style="margin-top: auto; border-top: 1px solid var(--border); padding-top: 10px;">
+                <a href="index.html" class="nav-item"><span class="material-icons-round">logout</span> Voltar ao Site</a>
+            </div>
+        </div>
+    </aside>
+
+    <main class="main">
+        <header class="topbar">
+            <h2 style="font-size: 1.1rem;">Visão Geral do Mercado</h2>
+            <div class="search-box">
+                <span class="material-icons-round" style="font-size: 1.2rem;">search</span>
+                <input type="text" placeholder="Buscar ativo (ex: AAPL, BTC)...">
+            </div>
+            <div class="user-profile">
+                <span class="material-icons-round" style="color:var(--text-muted);">notifications</span>
+                <div class="avatar">JD</div>
+            </div>
+        </header>
+
+        <div class="content-scroll">
+            <div class="grid-container">
+
+                <div class="left-col">
+
+                    <div class="overview-cards">
+                        <div class="card">
+                            <div style="display:flex; justify-content:space-between;">
+                                <h3>S&P 500</h3>
+                                <span class="num text-up" style="font-size:0.8rem;">+1.2%</span>
+                            </div>
+                            <div class="big-val num">4,780.20</div>
+                            <div id="spark1" style="margin-bottom: -10px;"></div>
+                        </div>
+
+                        <div class="card">
+                            <div style="display:flex; justify-content:space-between;">
+                                <h3>Bitcoin</h3>
+                                <span class="num text-up" style="font-size:0.8rem;" id="btcChange">--%</span>
+                            </div>
+                            <div class="big-val num" id="btcPrice">$0.00</div>
+                            <div id="spark2" style="margin-bottom: -10px;"></div>
+                        </div>
+
+                        <div class="card">
+                            <div style="display:flex; justify-content:space-between;">
+                                <h3>Ouro (Gold)</h3>
+                                <span class="num text-down" style="font-size:0.8rem;">-0.4%</span>
+                            </div>
+                            <div class="big-val num">2,045.10</div>
+                            <div id="spark3" style="margin-bottom: -10px;"></div>
+                        </div>
                     </div>
+
+                    <div class="table-container">
+                        <div class="table-header">
+                            <div class="tabs">
+                                <div class="tab active">Todos</div>
+                                <div class="tab">Cripto</div>
+                                <div class="tab">Ações EUA</div>
+                                <div class="tab">B3 (BR)</div>
+                            </div>
+                            <button class="btn-small">Filtrar</button>
+                        </div>
+
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Ativo</th>
+                                    <th>Preço</th>
+                                    <th>24h %</th>
+                                    <th>Vol (24h)</th>
+                                    <th>Score IA</th>
+                                    <th>Ação</th>
+                                </tr>
+                            </thead>
+                            <tbody id="assetTableBody">
+                                </tbody>
+                        </table>
+                    </div>
+
+                </div>
+
+                <div class="right-panel">
+
+                    <div class="card">
+                        <h3>Sentimento do Mercado</h3>
+                        <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-top:10px;">
+                            <span style="font-size:1.5rem; font-weight:700; color:var(--up);">Ganância</span>
+                            <span class="num">74/100</span>
+                        </div>
+                        <div class="sentiment-track">
+                            <div class="sent-segment" style="width: 20%; background: var(--down); opacity: 0.5;"></div>
+                            <div class="sent-segment" style="width: 20%; background: var(--down); opacity: 0.2;"></div>
+                            <div class="sent-segment" style="width: 20%; background: #555; opacity: 0.2;"></div>
+                            <div class="sent-segment" style="width: 40%; background: var(--up);"></div>
+                        </div>
+                        <p class="text-muted" style="font-size:0.8rem; margin-top:10px;">
+                            Investidores estão otimistas. Cuidado com correções de curto prazo.
+                        </p>
+                    </div>
+
                     <div>
-                        <div class="live-price green price-text" id="headerPrice">---</div>
-                        <div style="font-size: 0.75rem; color: var(--text-secondary);">≈ R$ <span id="brlPrice">---</span></div>
-                    </div>
-                    <div class="market-stats">
-                        <div style="font-size: 0.7rem; color: var(--text-secondary);">24h High</div>
-                        <div class="numbers" style="font-size: 0.8rem;">99,230.00</div>
-                    </div>
-                    <div class="market-stats">
-                        <div style="font-size: 0.7rem; color: var(--text-secondary);">24h Vol</div>
-                        <div class="numbers" style="font-size: 0.8rem;">420M USDT</div>
-                    </div>
-                </div>
+                        <h3 class="text-muted" style="font-size:0.85rem; text-transform:uppercase; font-weight:700; margin-bottom:15px;">
+                            Recomendações IA
+                        </h3>
 
-                <div class="user-actions">
-                    <div style="text-align: right; margin-right: 10px;">
-                        <div style="font-size: 0.75rem; color: var(--text-secondary);">Saldo Estimado</div>
-                        <div class="numbers" style="font-size: 0.9rem; font-weight: bold;">$ 24,500.00</div>
-                    </div>
-                    <button class="btn btn-deposit">Depositar</button>
-                    <a href="index.html" class="btn btn-outline" style="text-decoration: none;">Sair</a>
-                </div>
-            </header>
-
-            <div class="dashboard-grid">
-                
-                <div class="panel assets-panel">
-                    <div class="panel-header">
-                        <span>Pair</span>
-                        <span>Last Price</span>
-                    </div>
-                    <div id="assetList">
-                        </div>
-                </div>
-
-                <div class="panel chart-panel">
-                    <div class="panel-header">
-                        <span>TradingView (Original)</span>
-                        <span style="color: var(--text-secondary)">1H 4H 1D 1W</span>
-                    </div>
-                    <div id="chart" class="chart-container"></div>
-                </div>
-
-                <div class="panel order-book-panel">
-                    <div class="panel-header">
-                        <span>Order Book</span>
-                        <span>0.01</span>
-                    </div>
-                    <div class="order-book" id="orderBook">
-                        <div class="asks" id="asksList"></div>
-                        
-                        <div style="padding: 10px 15px; font-size: 1.1rem; font-weight: bold; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); text-align: center;" id="midPrice" class="price-text">
-                            ---
+                        <div class="signal-card buy">
+                            <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+                                <span style="font-weight:700;">NVDA</span>
+                                <span class="confidence-pill text-up">92% Conf.</span>
+                            </div>
+                            <p style="font-size:0.85rem; color:#ccc;">Rompimento de bandeira de alta. Alvo em $135.</p>
+                            <div style="margin-top:8px; font-size:0.75rem;" class="text-up num">BUY SIGNAL</div>
                         </div>
 
-                        <div class="bids" id="bidsList"></div>
-                    </div>
-                </div>
+                        <div class="signal-card sell">
+                            <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+                                <span style="font-weight:700;">EUR/USD</span>
+                                <span class="confidence-pill text-down">78% Conf.</span>
+                            </div>
+                            <p style="font-size:0.85rem; color:#ccc;">Resistência forte em 1.1050. Divergência no RSI.</p>
+                            <div style="margin-top:8px; font-size:0.75rem;" class="text-down num">SELL SIGNAL</div>
+                        </div>
 
-                <div class="panel trades-panel">
-                    <div class="panel-header">Market Trades</div>
-                    <table class="trade-table">
-                        <thead>
-                            <tr>
-                                <th>Time</th>
-                                <th>Price (USDT)</th>
-                                <th>Amount (BTC)</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tradeHistory">
-                            </tbody>
-                    </table>
+                        <div class="signal-card buy">
+                            <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+                                <span style="font-weight:700;">PETR4</span>
+                                <span class="confidence-pill text-up">65% Conf.</span>
+                            </div>
+                            <p style="font-size:0.85rem; color:#ccc;">Pagamento de dividendos próximo. Fluxo comprador alto.</p>
+                            <div style="margin-top:8px; font-size:0.75rem;" class="text-up num">ACCUMULATE</div>
+                        </div>
+
+                    </div>
                 </div>
 
             </div>
         </div>
-    </div>
+    </main>
 
     <script>
-        // 1. WebSocket Conexão com Binance
-        const ws = new WebSocket('wss://stream.binance.com:9443/ws/btcusdt@trade/ethusdt@trade/solusdt@trade');
-        
-        // Elementos DOM
-        const elPrice = document.getElementById('headerPrice');
-        const elBrl = document.getElementById('brlPrice');
-        const elMidPrice = document.getElementById('midPrice');
-        
-        let currentBtcPrice = 0;
-
-        // Lista de Ativos Simulados na Esquerda
+        // 1. DADOS DOS ATIVOS (Misto de Reais e Simulados)
+        // Imagens pegas de logos públicas para dar realismo
         const assets = [
-            { s: 'BTCUSDT', n: 'Bitcoin', p: 0 },
-            { s: 'ETHUSDT', n: 'Ethereum', p: 0 },
-            { s: 'SOLUSDT', n: 'Solana', p: 0 },
-            { s: 'BNBUSDT', n: 'BNB', p: 612.40 },
-            { s: 'XRPUSDT', n: 'Ripple', p: 2.45 }
+            { id: 'btcusdt', name: 'Bitcoin', ticker: 'BTC', type: 'crypto', price: 0, change: 0, vol: '42B', score: 8.5, img: 'https://cryptologos.cc/logos/bitcoin-btc-logo.png' },
+            { id: 'ethusdt', name: 'Ethereum', ticker: 'ETH', type: 'crypto', price: 0, change: 0, vol: '18B', score: 7.9, img: 'https://cryptologos.cc/logos/ethereum-eth-logo.png' },
+            { id: 'solusdt', name: 'Solana', ticker: 'SOL', type: 'crypto', price: 0, change: 0, vol: '5B', score: 9.1, img: 'https://cryptologos.cc/logos/solana-sol-logo.png' },
+            { id: 'aapl', name: 'Apple Inc.', ticker: 'AAPL', type: 'stock', price: 185.40, change: 1.2, vol: '3B', score: 6.5, img: 'https://upload.wikimedia.org/wikipedia/commons/f/fa/Apple_logo_black.svg' },
+            { id: 'tsla', name: 'Tesla', ticker: 'TSLA', type: 'stock', price: 240.10, change: -2.1, vol: '8B', score: 5.4, img: 'https://upload.wikimedia.org/wikipedia/commons/e/e8/Tesla_logo.png' },
+            { id: 'petr4', name: 'Petrobras', ticker: 'PETR4', type: 'stock', price: 38.50, change: 0.8, vol: '900M', score: 8.0, img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/30/Petrobras_logo.svg/1200px-Petrobras_logo.svg.png' },
         ];
 
-        // Atualiza a lista lateral
-        function renderAssets() {
-            const container = document.getElementById('assetList');
-            container.innerHTML = assets.map(a => `
-                <div class="asset-row">
-                    <div>
-                        <span style="font-weight:600; display:block;">${a.s.replace('USDT','')}</span>
-                        <span style="color:#666; font-size:0.7rem;">Vol ${Math.floor(Math.random()*900)}M</span>
-                    </div>
-                    <div class="numbers" style="color:${Math.random() > 0.5 ? 'var(--up-color)' : 'var(--down-color)'}">
-                        ${a.p > 0 ? a.p.toFixed(2) : '--'}
-                    </div>
-                </div>
-            `).join('');
-        }
-        renderAssets();
+        // 2. RENDERIZAÇÃO DA TABELA
+        function renderTable() {
+            const tbody = document.getElementById('assetTableBody');
+            tbody.innerHTML = assets.map(asset => {
+                const colorClass = asset.change >= 0 ? 'text-up' : 'text-down';
+                const sign = asset.change >= 0 ? '+' : '';
+                const scoreColor = asset.score >= 8 ? 'text-up' : (asset.score >= 5 ? 'text-muted' : 'text-down');
 
-        // 2. Recebendo Dados Reais
+                // Formatação de preço
+                let displayPrice = asset.price;
+                if(asset.id === 'petr4') displayPrice = `R$ ${asset.price.toFixed(2)}`;
+                else displayPrice = `$ ${asset.price.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+
+                return `
+                <tr id="row-${asset.id}">
+                    <td>
+                        <div style="display:flex; align-items:center;">
+                            <img src="${asset.img}" class="asset-icon" style="background:#fff; padding:2px;">
+                            <div>
+                                <div style="font-weight:600;">${asset.ticker}</div>
+                                <div style="font-size:0.75rem; color:#666;">${asset.name}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="num" style="font-weight:600;">${displayPrice}</td>
+                    <td class="num ${colorClass}">${sign}${asset.change.toFixed(2)}%</td>
+                    <td class="num text-muted">${asset.vol}</td>
+                    <td class="num ${scoreColor}" style="font-weight:bold;">${asset.score}/10</td>
+                    <td><button class="btn-small btn-trade">Trade</button></td>
+                </tr>
+                `;
+            }).join('');
+        }
+
+        // 3. WEBSOCKET PARA CRIPTO (Dados Reais)
+        const ws = new WebSocket('wss://stream.binance.com:9443/ws/btcusdt@trade/ethusdt@trade/solusdt@trade');
+        let prevPrices = {};
+
         ws.onmessage = (event) => {
             const data = JSON.parse(event.data);
+            const symbol = data.s.toLowerCase(); // btcusdt
             const price = parseFloat(data.p);
-            const symbol = data.s;
 
-            // Atualiza lista lateral se for um dos nossos
-            const asset = assets.find(a => a.s === symbol);
+            // Achar o ativo no array
+            const asset = assets.find(a => a.id === symbol);
             if(asset) {
-                asset.p = price;
-                // Atualiza visualmente a cada X mensagens para não travar
-                if(Math.random() > 0.8) renderAssets(); 
-            }
+                asset.price = price;
 
-            // Se for Bitcoin, atualiza tudo
-            if(symbol === 'BTCUSDT') {
-                currentBtcPrice = price;
-                
-                // Header
-                elPrice.innerText = price.toFixed(2);
-                elBrl.innerText = (price * 5.8).toFixed(2); // Dólar estimado
-                elMidPrice.innerText = price.toFixed(2);
-                
-                // Cor do preço
-                elPrice.style.color = data.m ? 'var(--down-color)' : 'var(--up-color)'; // m=true significa Maker (Venda)
+                // Calcular variação fake baseada no movimento (já que WS trade não manda %)
+                // Na vida real usaria o endpoint 'ticker/24hr'
+                if(prevPrices[symbol]) {
+                    const diff = ((price - prevPrices[symbol]) / prevPrices[symbol]) * 1000;
+                    // Multipliquei por 1000 pra dar movimento visual rápido na %
+                    asset.change = asset.change + diff;
+                }
+                prevPrices[symbol] = price;
 
-                // Atualiza Order Book e Trades
-                updateOrderBook(price);
-                addTradeToHistory(price, data.q, data.m); // q = quantity, m = isBuyerMaker
+                // Atualizar DOM específico pra não recriar a tabela toda hora (Performance)
+                const row = document.getElementById(`row-${symbol}`);
+                if(row) {
+                    row.children[1].innerText = `$ ${price.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
+                    const changeCell = row.children[2];
+                    changeCell.innerText = `${asset.change >= 0 ? '+' : ''}${asset.change.toFixed(2)}%`;
+                    changeCell.className = `num ${asset.change >= 0 ? 'text-up' : 'text-down'}`;
+                }
+
+                // Atualizar Card do Topo (Se for BTC)
+                if(symbol === 'btcusdt') {
+                    document.getElementById('btcPrice').innerText = `$ ${price.toLocaleString()}`;
+                    document.getElementById('btcChange').innerText = `${asset.change >= 0 ? '+' : ''}${asset.change.toFixed(2)}%`;
+                    document.getElementById('btcChange').className = `num ${asset.change >= 0 ? 'text-up' : 'text-down'}`;
+                }
             }
         };
 
-        // 3. Simulação de Order Book (Baseado no Preço Real)
-        // Criar dados "fakes" ao redor do preço real para parecer um book de ofertas
-        function updateOrderBook(price) {
-            const asksContainer = document.getElementById('asksList');
-            const bidsContainer = document.getElementById('bidsList');
-            
-            let asksHtml = '';
-            let bidsHtml = '';
+        // 4. SIMULAÇÃO PARA AÇÕES (Stocks não tem WS público fácil)
+        setInterval(() => {
+            // Random walk para Stocks (AAPL, TSLA, PETR4)
+            assets.filter(a => a.type === 'stock').forEach(asset => {
+                const move = (Math.random() - 0.5) * 0.5; // Move um pouco
+                asset.price += move;
+                asset.change += (move / asset.price) * 100;
 
-            // Gerar 8 linhas de Venda (Preço > Atual)
-            for(let i=7; i>=0; i--) {
-                const p = price + (i * 2.5) + Math.random();
-                const q = (Math.random() * 2).toFixed(4);
-                asksHtml += `
-                    <div class="ob-row">
-                        <div class="depth-bar bg-red" style="width: ${Math.random()*100}%"></div>
-                        <div class="ob-data">
-                            <span class="red">${p.toFixed(1)}</span>
-                            <span style="color:#aaa">${q}</span>
-                        </div>
-                    </div>`;
-            }
-
-            // Gerar 8 linhas de Compra (Preço < Atual)
-            for(let i=0; i<8; i++) {
-                const p = price - (i * 2.5) - Math.random();
-                const q = (Math.random() * 2).toFixed(4);
-                bidsHtml += `
-                    <div class="ob-row">
-                        <div class="depth-bar bg-green" style="width: ${Math.random()*100}%"></div>
-                        <div class="ob-data">
-                            <span class="green">${p.toFixed(1)}</span>
-                            <span style="color:#aaa">${q}</span>
-                        </div>
-                    </div>`;
-            }
-
-            asksContainer.innerHTML = asksHtml;
-            bidsContainer.innerHTML = bidsHtml;
-        }
-
-        // 4. Histórico de Trades
-        function addTradeToHistory(price, amount, isSell) {
-            const container = document.getElementById('tradeHistory');
-            const row = document.createElement('tr');
-            const time = new Date().toLocaleTimeString('pt-BR');
-            const color = isSell ? 'var(--down-color)' : 'var(--up-color)';
-            
-            row.innerHTML = `
-                <td style="color:#aaa">${time}</td>
-                <td style="color:${color}; font-weight:600;">${parseFloat(price).toFixed(1)}</td>
-                <td style="font-family:'Roboto Mono'">${parseFloat(amount).toFixed(5)}</td>
-            `;
-
-            container.prepend(row);
-            if(container.children.length > 10) container.lastChild.remove();
-        }
-
-        // 5. Gráfico (ApexCharts) - Carregamento Inicial
-        async function initChart() {
-            // Busca dados históricos
-            const res = await fetch('https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1h&limit=50');
-            const data = await res.json();
-            
-            const seriesData = data.map(d => ({
-                x: new Date(d[0]),
-                y: [d[1], d[2], d[3], d[4]].map(parseFloat)
-            }));
-
-            var options = {
-                series: [{ data: seriesData }],
-                chart: {
-                    type: 'candlestick',
-                    height: '100%',
-                    background: 'transparent',
-                    toolbar: { show: false },
-                    animations: { enabled: false }
-                },
-                theme: { mode: 'dark' },
-                grid: {
-                    borderColor: '#2b3139',
-                    xaxis: { lines: { show: true } }   
-                },
-                xaxis: {
-                    type: 'datetime',
-                    labels: { style: { colors: '#848e9c' } },
-                    axisBorder: { show: false },
-                    axisTicks: { show: false }
-                },
-                yaxis: {
-                    opposite: true,
-                    labels: { style: { colors: '#848e9c' } }
-                },
-                plotOptions: {
-                    candlestick: {
-                        colors: { upward: '#00e676', downward: '#ff1744' }
-                    }
+                // Update Row
+                const row = document.getElementById(`row-${asset.id}`);
+                if(row) {
+                    let prefix = asset.id === 'petr4' ? 'R$ ' : '$ ';
+                    row.children[1].innerText = `${prefix}${asset.price.toFixed(2)}`;
+                    const changeCell = row.children[2];
+                    changeCell.innerText = `${asset.change >= 0 ? '+' : ''}${asset.change.toFixed(2)}%`;
+                    changeCell.className = `num ${asset.change >= 0 ? 'text-up' : 'text-down'}`;
                 }
-            };
+            });
+        }, 2000);
 
-            var chart = new ApexCharts(document.querySelector("#chart"), options);
-            chart.render();
-        }
-        
-        initChart();
+        // 5. SPARKLINES (Gráficos Pequenos)
+        const sparkOptions = {
+            chart: { type: 'area', height: 50, sparkline: { enabled: true } },
+            stroke: { curve: 'smooth', width: 2 },
+            fill: { opacity: 0.2 },
+            tooltip: { fixed: { enabled: false }, x: { show: false }, y: { title: { formatter: () => '' } }, marker: { show: false } }
+        };
 
+        new ApexCharts(document.querySelector("#spark1"), { ...sparkOptions, series: [{ data: [10,12,14,13,15,16,18,17,19] }], colors: ['#00c087'] }).render();
+        new ApexCharts(document.querySelector("#spark2"), { ...sparkOptions, series: [{ data: [40,42,41,44,43,46,45,48,50] }], colors: ['#3772ff'] }).render();
+        new ApexCharts(document.querySelector("#spark3"), { ...sparkOptions, series: [{ data: [80,78,75,76,74,72,70,71,69] }], colors: ['#fd4d4d'] }).render();
+
+        // Init
+        renderTable();
     </script>
 </body>
 </html>
