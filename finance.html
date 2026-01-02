@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Beaqme Finance | Market Data</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+
+    <style>
+        /* --- CONFIGURAÇÕES VISUAIS (Terminal Style) --- */
+        :root {
+            --bg-color: #050507;
+            --card-bg: #111116;
+            --text-color: #e0e0e0;
+            --accent: #8a2be2;
+            --green: #00e676;
+            --red: #ff1744;
+            --border: rgba(255,255,255,0.1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+
+        body { background-color: var(--bg-color); color: var(--text-color); padding-bottom: 50px; }
+
+        /* --- HEADER --- */
+        header {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 20px 5%; border-bottom: 1px solid var(--border);
+            background: rgba(5,5,7,0.95); position: sticky; top: 0; z-index: 100;
+        }
+
+        .brand { font-weight: 800; font-size: 1.2rem; display: flex; align-items: center; gap: 10px; }
+
+        /* Bolinha verde piscando (Live) */
+        .live-dot {
+            width: 8px; height: 8px; background: var(--green);
+            border-radius: 50%; box-shadow: 0 0 10px var(--green);
+            animation: pulse 2s infinite;
+        }
+
+        .btn-back {
+            padding: 8px 16px; border: 1px solid var(--border); border-radius: 6px;
+            color: #888; text-decoration: none; font-size: 0.85rem; transition: 0.3s;
+        }
+        .btn-back:hover { border-color: var(--accent); color: #fff; background: rgba(138, 43, 226, 0.1); }
+
+        /* --- TICKER TAPE (Faixa correndo) --- */
+        .ticker-wrap {
+            width: 100%; overflow: hidden; background: #0f0f12; border-bottom: 1px solid var(--border);
+            padding: 10px 0; white-space: nowrap;
+        }
+        .ticker { display: inline-block; animation: ticker 30s linear infinite; }
+        .ticker-item { display: inline-block; padding: 0 2rem; color: #888; font-size: 0.85rem; }
+        .up { color: var(--green); } .down { color: var(--red); }
+
+        /* --- LAYOUT GRID --- */
+        .dashboard-container {
+            max-width: 1400px; margin: 40px auto; padding: 0 5%;
+            display: grid; grid-template-columns: 3fr 1fr; gap: 30px;
+        }
+
+        /* --- MAIN CHART CARD --- */
+        .card {
+            background: var(--card-bg); border: 1px solid var(--border);
+            border-radius: 12px; padding: 25px; position: relative;
+        }
+
+        .card-header { display: flex; justify-content: space-between; margin-bottom: 20px; align-items: center; }
+        .asset-info h2 { font-size: 1.5rem; margin-bottom: 5px;}
+        .asset-price { font-size: 2.2rem; font-weight: 700; color: #fff; transition: color 0.3s;}
+        .asset-change { font-size: 1rem; padding: 4px 8px; border-radius: 4px; background: rgba(0, 230, 118, 0.1); color: var(--green); margin-left: 10px; }
+
+        /* --- SIDEBAR LIST --- */
+        .recommendation-list { display: flex; flex-direction: column; gap: 15px; }
+
+        .list-item {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 15px; background: rgba(255,255,255,0.03);
+            border-radius: 8px; cursor: pointer; transition: 0.3s;
+            border-left: 3px solid transparent;
+        }
+        .list-item:hover { background: rgba(255,255,255,0.06); }
+        .list-item.active { border-left-color: var(--accent); background: rgba(138, 43, 226, 0.1); }
+
+        .coin-name { font-weight: 600; color: #fff; display: block; }
+        .coin-sub { font-size: 0.75rem; color: #666; }
+        .signal-badge {
+            font-size: 0.7rem; padding: 4px 8px; border-radius: 4px;
+            text-transform: uppercase; font-weight: 700; margin-top: 5px; display: inline-block;
+        }
+        .buy { color: var(--green); background: rgba(0,230,118,0.1); }
+        .sell { color: var(--red); background: rgba(255,23,68,0.1); }
+
+        /* --- ANIMATIONS --- */
+        @keyframes ticker { 0% { transform: translateX(0%); } 100% { transform: translateX(-100%); } }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+
+        /* RESPONSIVE */
+        @media (max-width: 900px) {
+            .dashboard-container { grid-template-columns: 1fr; }
+            .asset-price { font-size: 1.8rem; }
+            .card-header { flex-direction: column; align-items: flex-start; gap: 15px; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="brand">
+            <div class="live-dot"></div> Beaqme Finance <span style="font-size:0.8rem; color:#666; font-weight:400; margin-left: 5px;">PRO TERM</span>
+        </div>
+        <a href="index.html" class="btn-back">← Voltar para o Site</a>
+    </header>
+
+    <div class="ticker-wrap">
+        <div class="ticker">
+            <span class="ticker-item">BTC <span class="up">▲ 1.2%</span></span>
+            <span class="ticker-item">ETH <span class="down">▼ -0.5%</span></span>
+            <span class="ticker-item">SPX <span class="up">▲ 0.8%</span></span>
+            <span class="ticker-item">BRL/USD <span class="down">▼ -0.1%</span></span>
+            <span class="ticker-item">AAPL <span class="up">▲ 2.4%</span></span>
+            <span class="ticker-item">PETR4 <span class="up">▲ 1.1%</span></span>
+            <span class="ticker-item">NVDA <span class="up">▲ 3.5%</span></span>
+            <span class="ticker-item">TSLA <span class="down">▼ -1.2%</span></span>
+        </div>
+    </div>
+
+    <div class="dashboard-container">
+
+        <div class="main-chart">
+            <div class="card">
+                <div class="card-header">
+                    <div class="asset-info">
+                        <h2>Bitcoin <span style="color:#666; font-size:1rem;">/ USD</span></h2>
+                        <div style="display:flex; align-items:center;">
+                            <span class="asset-price" id="mainPrice">98,420.50</span>
+                            <span class="asset-change" id="mainChange">+2.4%</span>
+                        </div>
+                    </div>
+                    <div>
+                        <button class="btn-back" style="background:var(--accent); color:#fff; border:none; cursor:pointer;">Trade Now</button>
+                    </div>
+                </div>
+                <div id="chart"></div>
+            </div>
+
+            <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap:20px; margin-top:20px;">
+                <div class="card" style="padding:15px; text-align:center;">
+                    <p style="color:#666; font-size:0.8rem;">Volume (24h)</p>
+                    <h3 style="color:#fff;">$42.8B</h3>
+                </div>
+                <div class="card" style="padding:15px; text-align:center;">
+                    <p style="color:#666; font-size:0.8rem;">Max (24h)</p>
+                    <h3 style="color:var(--green);">99,100</h3>
+                </div>
+                <div class="card" style="padding:15px; text-align:center;">
+                    <p style="color:#666; font-size:0.8rem;">Min (24h)</p>
+                    <h3 style="color:var(--red);">96,200</h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="sidebar">
+            <h3 style="margin-bottom:20px; color:#888; font-size:0.9rem; text-transform:uppercase; letter-spacing: 1px;">Sinais de IA</h3>
+
+            <div class="recommendation-list">
+                <div class="list-item active">
+                    <div>
+                        <span class="coin-name">BTC / USD</span>
+                        <span class="coin-sub">Bitcoin Core</span>
+                    </div>
+                    <div style="text-align:right;">
+                        <span style="display:block; font-weight:600;">$98k</span>
+                        <span class="signal-badge buy">Compra Forte</span>
+                    </div>
+                </div>
+
+                <div class="list-item">
+                    <div>
+                        <span class="coin-name">ETH / USD</span>
+                        <span class="coin-sub">Ethereum</span>
+                    </div>
+                    <div style="text-align:right;">
+                        <span style="display:block; font-weight:600;">$3,420</span>
+                        <span class="signal-badge buy">Compra</span>
+                    </div>
+                </div>
+
+                <div class="list-item">
+                    <div>
+                        <span class="coin-name">SOL / USD</span>
+                        <span class="coin-sub">Solana</span>
+                    </div>
+                    <div style="text-align:right;">
+                        <span style="display:block; font-weight:600;">$145</span>
+                        <span class="signal-badge sell">Venda</span>
+                    </div>
+                </div>
+
+                <div class="list-item">
+                    <div>
+                        <span class="coin-name">PETR4</span>
+                        <span class="coin-sub">Petrobras</span>
+                    </div>
+                    <div style="text-align:right;">
+                        <span style="display:block; font-weight:600;">R$ 38,40</span>
+                        <span class="signal-badge buy">Compra</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card" style="margin-top:30px; border-color:var(--accent); background: rgba(138, 43, 226, 0.05);">
+                <h4 style="color:var(--accent); margin-bottom:10px; font-size: 0.9rem;">⚡ Beaqme Analytics</h4>
+                <p style="font-size:0.8rem; color:#aaa; line-height:1.5;">
+                    O algoritmo detectou um padrão de rompimento (bullish flag) no gráfico diário. Probabilidade de alta: 85%.
+                </p>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // 1. Configuração do Gráfico (ApexCharts)
+        var options = {
+            chart: {
+                type: 'candlestick',
+                height: 350,
+                toolbar: { show: false },
+                background: 'transparent',
+                animations: { enabled: false } // Desativa animação interna pra não pesar
+            },
+            series: [{
+                data: [
+                    { x: new Date(1538778600000), y: [6629.81, 6650.5, 6623.04, 6633.33] },
+                    { x: new Date(1538780400000), y: [6632.01, 6643.59, 6620, 6630.11] },
+                    { x: new Date(1538782200000), y: [6630.71, 6648.95, 6623.34, 6635.65] },
+                    { x: new Date(1538784000000), y: [6635.65, 6651, 6629.67, 6638.24] },
+                    { x: new Date(1538785800000), y: [6638.24, 6640, 6620, 6624.47] },
+                    { x: new Date(1538787600000), y: [6624.53, 6636.03, 6621.68, 6624.31] },
+                    { x: new Date(1538789400000), y: [6624.61, 6632.2, 6617, 6626.02] },
+                    { x: new Date(1538791200000), y: [6627, 6627.62, 6584.22, 6603.02] },
+                    { x: new Date(1538793000000), y: [6605, 6608.03, 6598.95, 6604.01] },
+                    { x: new Date(1538794800000), y: [6604.5, 6614.4, 6602.26, 6608.02] }
+                ]
+            }],
+            theme: { mode: 'dark' },
+            xaxis: {
+                type: 'datetime',
+                labels: { style: { colors: '#666' } },
+                axisBorder: { show: false },
+                axisTicks: { show: false }
+            },
+            yaxis: {
+                tooltip: { enabled: true },
+                labels: { style: { colors: '#666' } }
+            },
+            grid: {
+                borderColor: '#333',
+                strokeDashArray: 4,
+            },
+            plotOptions: {
+                candlestick: {
+                    colors: {
+                        upward: '#00e676',
+                        downward: '#ff1744'
+                    }
+                }
+            }
+        };
+
+        var chart = new ApexCharts(document.querySelector("#chart"), options);
+        chart.render();
+
+        // 2. Simulação de Preços em Tempo Real (O truque do portfólio)
+        function simulateLivePrices() {
+            const priceElement = document.getElementById('mainPrice');
+            let currentPrice = 98420.50;
+
+            setInterval(() => {
+                // Gera um movimento aleatório (+ ou -)
+                const move = (Math.random() - 0.5) * 80;
+                currentPrice += move;
+
+                // Atualiza o texto formatado (ex: 98,450.20)
+                priceElement.innerText = currentPrice.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+                // Muda a cor rapidinho se subiu ou desceu
+                if(move > 0) {
+                    priceElement.style.color = 'var(--green)';
+                } else {
+                    priceElement.style.color = 'var(--red)';
+                }
+
+                // Retorna para branco depois de meio segundo
+                setTimeout(() => {
+                    priceElement.style.color = '#fff';
+                }, 500);
+
+            }, 2500); // Roda a cada 2.5 segundos
+        }
+
+        simulateLivePrices();
+    </script>
+</body>
+</html>

@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task AI | Project Manager</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root { --bg: #0f172a; --card: #1e293b; --text: #f8fafc; --primary: #3b82f6; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body { background: var(--bg); color: var(--text); height: 100vh; display: flex; flex-direction: column; }
+
+        /* Navbar */
+        nav { padding: 15px 30px; background: #1e293b; border-bottom: 1px solid #334155; display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-weight: 700; font-size: 1.2rem; color: var(--primary); display: flex; align-items: center; gap: 8px; }
+        .back-btn { color: #94a3b8; text-decoration: none; font-size: 0.9rem; }
+        .back-btn:hover { color: #fff; }
+
+        /* Layout Kanban */
+        .board { display: flex; gap: 20px; padding: 30px; overflow-x: auto; height: 100%; }
+
+        .column {
+            background: #1e293b; min-width: 300px; border-radius: 12px; padding: 15px;
+            display: flex; flex-direction: column; gap: 15px; border: 1px solid #334155;
+        }
+
+        .col-header { font-weight: 600; color: #94a3b8; display: flex; justify-content: space-between; }
+        .badge { background: #334155; padding: 2px 8px; border-radius: 12px; font-size: 0.8rem; }
+
+        /* Task Cards */
+        .task {
+            background: #334155; padding: 15px; border-radius: 8px; cursor: grab;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: 0.2s; position: relative;
+        }
+        .task:hover { transform: translateY(-3px); background: #475569; }
+        .task-tag { font-size: 0.7rem; padding: 4px 8px; border-radius: 4px; text-transform: uppercase; font-weight: bold; margin-bottom: 8px; display: inline-block; }
+        .tag-dev { background: rgba(59, 130, 246, 0.2); color: #60a5fa; }
+        .tag-design { background: rgba(236, 72, 153, 0.2); color: #f472b6; }
+        .tag-high { background: rgba(239, 68, 68, 0.2); color: #f87171; }
+
+        .task h4 { font-size: 1rem; margin-bottom: 5px; }
+        .task p { font-size: 0.85rem; color: #cbd5e1; }
+        .avatars { display: flex; margin-top: 10px; }
+        .avatar { width: 25px; height: 25px; background: #64748b; border-radius: 50%; border: 2px solid #334155; margin-left: -8px; }
+
+        /* Botão AI */
+        .ai-btn {
+            background: linear-gradient(90deg, #6366f1, #8b5cf6); border: none; padding: 8px 16px;
+            border-radius: 6px; color: white; cursor: pointer; font-weight: 600; font-size: 0.9rem;
+            box-shadow: 0 0 15px rgba(99, 102, 241, 0.4);
+        }
+        .ai-btn:hover { box-shadow: 0 0 25px rgba(99, 102, 241, 0.6); }
+
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="logo">⚡ Task AI Flow</div>
+        <div>
+            <button class="ai-btn">✨ Ask AI Assistant</button>
+            <a href="index.html" class="back-btn" style="margin-left: 20px;">Voltar</a>
+        </div>
+    </nav>
+
+    <div class="board">
+        <div class="column">
+            <div class="col-header">TO DO <span class="badge">3</span></div>
+
+            <div class="task">
+                <span class="task-tag tag-high">Alta Prioridade</span>
+                <h4>Integração API Stripe</h4>
+                <p>Configurar webhooks para pagamentos recorrentes.</p>
+                <div class="avatars"><div class="avatar"></div><div class="avatar"></div></div>
+            </div>
+
+            <div class="task">
+                <span class="task-tag tag-design">Design</span>
+                <h4>Novo Dashboard</h4>
+                <p>Criar protótipo no Figma da tela de analytics.</p>
+                <div class="avatars"><div class="avatar"></div></div>
+            </div>
+        </div>
+
+        <div class="column">
+            <div class="col-header">IN PROGRESS <span class="badge">2</span></div>
+
+            <div class="task">
+                <span class="task-tag tag-dev">Backend</span>
+                <h4>Otimização DB</h4>
+                <p>Refatorar queries SQL para reduzir latência em 40%.</p>
+                <div class="avatars"><div class="avatar"></div><div class="avatar"></div></div>
+            </div>
+
+            <div class="task" style="border: 1px solid #8b5cf6;">
+                <span class="task-tag" style="background:#8b5cf6; color:white;">AI Generated</span>
+                <h4>Sugestão: Cache Redis</h4>
+                <p>Implementar cache para sessão de usuários.</p>
+            </div>
+        </div>
+
+        <div class="column">
+            <div class="col-header">DONE <span class="badge">5</span></div>
+            <div class="task" style="opacity: 0.6;">
+                <span class="task-tag tag-dev">Fix</span>
+                <h4>Bug Login Mobile</h4>
+                <p>Corrigido erro de overflow no iPhone 13.</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
